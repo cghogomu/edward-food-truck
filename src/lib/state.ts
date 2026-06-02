@@ -1,17 +1,41 @@
 import "server-only";
 import { promises as fs } from "fs";
 import path from "path";
+import { Redis } from "@upstash/redis";
 import type { SiteState, OpenStatus, CalendarEntry } from "@/types";
 
 const STATE_FILE = path.join(process.cwd(), "data", "site-state.json");
+const STATE_KEY = "edward-food-truck:site-state";
 
-export async function getSiteState(): Promise<SiteState> {
+// Hosts like Vercel run on a read-only filesystem, so file writes silently
+// fail there. When Upstash Redis env vars are present we persist to Redis;
+// otherwise (local dev) we fall back to the JSON file on disk.
+const redis = process.env.UPSTASH_REDIS_REST_URL ? Redis.fromEnv() : null;
+
+async function readSeed(): Promise<SiteState> {
   const raw = await fs.readFile(STATE_FILE, "utf-8");
   return JSON.parse(raw) as SiteState;
 }
 
+export async function getSiteState(): Promise<SiteState> {
+  if (!redis) return readSeed();
+
+  const stored = await redis.get<SiteState>(STATE_KEY);
+  if (stored) return stored;
+
+  // First request against a fresh Redis: seed it from the bundled JSON so the
+  // deployed site starts with the same data it ships with.
+  const seed = await readSeed();
+  await redis.set(STATE_KEY, seed);
+  return seed;
+}
+
 export async function writeSiteState(state: SiteState): Promise<void> {
-  await fs.writeFile(STATE_FILE, JSON.stringify(state, null, 2), "utf-8");
+  if (!redis) {
+    await fs.writeFile(STATE_FILE, JSON.stringify(state, null, 2), "utf-8");
+    return;
+  }
+  await redis.set(STATE_KEY, state);
 }
 
 export async function patchSiteState(

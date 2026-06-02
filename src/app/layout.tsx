@@ -26,6 +26,11 @@ export const metadata: Metadata = {
     "Upscale quality, for blue collar pockets. Loaded potatoes made one at a time in Austin, Texas.",
 };
 
+// Site state (open status, inventory, banner, calendar) is edited live from
+// the dashboard, so every page must render at request time rather than being
+// frozen into the static build. This cascades to all nested routes.
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {

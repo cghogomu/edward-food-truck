@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type Stripe from "stripe";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
 import {
   priceOrder,
@@ -32,7 +33,12 @@ export async function POST(request: Request) {
     request.headers.get("origin") ||
     "http://localhost:3000";
 
-  const lineItems: import("stripe").Stripe.Checkout.SessionCreateParams.LineItem[] =
+  type CheckoutCreateParams = NonNullable<
+    Parameters<Stripe["checkout"]["sessions"]["create"]>[0]
+  >;
+  type LineItem = NonNullable<CheckoutCreateParams["line_items"]>[number];
+
+  const lineItems: LineItem[] =
     priced.lines.map((l) => ({
       quantity: l.quantity,
       price_data: {

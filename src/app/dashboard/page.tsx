@@ -83,7 +83,7 @@ export default function DashboardPage() {
       <CalendarControls state={state} onPatch={patch} />
 
       <p className="mt-12 text-xs text-(--text-muted) text-center">
-        Concept demo · changes write to a local file, visible site-wide on refresh.
+        Concept demo · changes save instantly, visible site-wide on refresh.
       </p>
     </div>
   );
