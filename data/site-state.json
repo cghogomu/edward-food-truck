@@ -1,0 +1,27 @@
+{
+  "inventory": {
+    "today": 14,
+    "max": 20
+  },
+  "soldOut": false,
+  "freeDeliveryBanner": true,
+  "today": "2026-05-17",
+  "hours": {
+    "open": "10:00",
+    "close": "16:00",
+    "days": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+  },
+  "calendar": [
+    { "date": "2026-05-18", "kind": "open" },
+    { "date": "2026-05-19", "kind": "open" },
+    { "date": "2026-05-20", "kind": "catering", "client": "Capital Factory — Q2 all-hands lunch" },
+    { "date": "2026-05-21", "kind": "open" },
+    { "date": "2026-05-22", "kind": "open" },
+    { "date": "2026-05-23", "kind": "catering", "client": "KIPP Comunidad Primary School — community festival" },
+    { "date": "2026-05-25", "kind": "closed", "note": "Family day" },
+    { "date": "2026-05-26", "kind": "open" },
+    { "date": "2026-05-27", "kind": "open" },
+    { "date": "2026-05-28", "kind": "catering", "client": "Range Studio — quarterly team day" },
+    { "date": "2026-05-29", "kind": "open" }
+  ]
+}

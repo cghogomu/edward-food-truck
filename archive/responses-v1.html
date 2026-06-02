@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your Food Truck Website — Responses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #FAF5EC;
+    --cream-2: #F2EADB;
+    --russet: #C56A2F;
+    --russet-deep: #A8551F;
+    --cocoa: #2A1F18;
+    --cocoa-soft: #4A3A2E;
+    --chive: #7A8B65;
+    --sour: #FFFFFF;
+    --line: rgba(42, 31, 24, 0.15);
+    --line-soft: rgba(42, 31, 24, 0.08);
+
+    --serif: "Fraunces", Georgia, serif;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--cream);
+    color: var(--cocoa);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 64px 40px 80px;
+  }
+
+  /* Header */
+  .doc-header {
+    margin-bottom: 56px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--line);
+  }
+  .doc-kicker {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--russet);
+    margin-bottom: 16px;
+  }
+  .doc-title {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 48px;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    margin-bottom: 16px;
+  }
+  .doc-intro {
+    font-size: 17px;
+    color: var(--cocoa-soft);
+    max-width: 620px;
+  }
+
+  /* Action bar */
+  .action-bar {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    background: var(--cocoa);
+    color: var(--cream);
+    border: none;
+    padding: 10px 18px;
+    border-radius: 4px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: var(--russet); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--cocoa);
+    border: 1px solid var(--line);
+  }
+  .btn.secondary:hover { background: var(--cream-2); border-color: var(--cocoa); }
+
+  /* Sections */
+  section.block {
+    margin-bottom: 56px;
+  }
+  .block-num {
+    font-family: var(--serif);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--russet);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .block-title {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 32px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin-bottom: 32px;
+    color: var(--cocoa);
+  }
+
+  /* Question */
+  .question {
+    margin-bottom: 36px;
+    padding-bottom: 36px;
+    border-bottom: 1px dashed var(--line-soft);
+  }
+  .question:last-child { border-bottom: none; padding-bottom: 0; }
+  .q-label {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 20px;
+    color: var(--cocoa);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .q-hint {
+    font-size: 14px;
+    color: var(--cocoa-soft);
+    margin-bottom: 16px;
+  }
+
+  /* Form fields */
+  .options-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  label.choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--sour);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 15px;
+  }
+  label.choice:hover { border-color: var(--russet); }
+  label.choice input[type="radio"],
+  label.choice input[type="checkbox"] {
+    margin-top: 3px;
+    accent-color: var(--russet);
+    flex-shrink: 0;
+  }
+  label.choice .choice-body {
+    flex: 1;
+  }
+  label.choice strong {
+    display: block;
+    color: var(--cocoa);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  label.choice .choice-detail {
+    font-size: 13px;
+    color: var(--cocoa-soft);
+  }
+
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"],
+  input[type="number"] {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--sour);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-family: var(--sans);
+    font-size: 15px;
+    color: var(--cocoa);
+    transition: border-color 0.15s;
+  }
+  input[type="text"]:focus,
+  input[type="tel"]:focus,
+  input[type="email"]:focus,
+  input[type="number"]:focus {
+    outline: none;
+    border-color: var(--russet);
+  }
+
+  textarea {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--sour);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-family: var(--sans);
+    font-size: 15px;
+    color: var(--cocoa);
+    min-height: 100px;
+    resize: vertical;
+    line-height: 1.55;
+  }
+  textarea:focus {
+    outline: none;
+    border-color: var(--russet);
+  }
+  textarea.tall { min-height: 140px; }
+
+  /* Inline input rows */
+  .field-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .field-row label {
+    font-size: 14px;
+    color: var(--cocoa-soft);
+    font-weight: 500;
+  }
+  .field-row.compact {
+    grid-template-columns: auto 1fr;
+  }
+
+  .name-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .name-row {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    align-items: center;
+    gap: 12px;
+  }
+  .name-row .num {
+    font-family: var(--serif);
+    font-weight: 600;
+    color: var(--russet);
+    font-size: 16px;
+  }
+
+  .inline-num {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .inline-num span {
+    font-size: 14px;
+    color: var(--cocoa-soft);
+  }
+  .inline-num input {
+    max-width: 120px;
+  }
+
+  /* Callout */
+  .callout {
+    background: var(--cream-2);
+    border-left: 3px solid var(--russet);
+    padding: 16px 20px;
+    margin: 24px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--russet);
+    margin-bottom: 6px;
+  }
+  .callout p { margin: 0; font-size: 14px; color: var(--cocoa-soft); }
+
+  /* Footer */
+  .doc-footer {
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+  .doc-footer h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+  .doc-footer ul {
+    list-style: none;
+    padding: 0;
+  }
+  .doc-footer li {
+    padding: 6px 0 6px 24px;
+    position: relative;
+    color: var(--cocoa-soft);
+  }
+  .doc-footer li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--russet);
+    font-weight: 600;
+  }
+
+  /* Print */
+  @media print {
+    @page { margin: 0.6in; }
+    body { background: var(--sour); }
+    .page { padding: 0; max-width: 100%; }
+    .action-bar { display: none; }
+    .doc-header { margin-bottom: 32px; padding-bottom: 16px; }
+    .doc-title { font-size: 36px; }
+    section.block { page-break-inside: avoid; margin-bottom: 32px; }
+    .block-title { font-size: 24px; margin-bottom: 20px; }
+    .q-label { font-size: 16px; }
+    label.choice {
+      page-break-inside: avoid;
+      background: transparent;
+      padding: 8px 12px;
+    }
+    input[type="text"],
+    input[type="tel"],
+    input[type="email"],
+    input[type="number"] {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--cocoa);
+      border-radius: 0;
+      padding: 4px 0;
+      min-height: 28px;
+    }
+    textarea {
+      background: transparent;
+      border: 1px solid var(--line);
+      min-height: 80px;
+    }
+    .name-row .num { font-size: 14px; }
+    .callout {
+      background: var(--cream-2);
+      page-break-inside: avoid;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    .page { padding: 40px 20px 60px; }
+    .doc-title { font-size: 36px; }
+    .block-title { font-size: 26px; }
+    .field-row {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="doc-header">
+    <div class="doc-kicker">For Edward · Take your time</div>
+    <h1 class="doc-title">Your responses<br/>at your own pace.</h1>
+    <p class="doc-intro">A few decisions for your food truck website. Fill in what you can in the browser, print it out and write by hand, or screenshot the filled-in page and send it back. Anything left blank, we'll cover at our next meeting — no pressure to finish it all.</p>
+    <div class="action-bar">
+      <button class="btn" onclick="window.print()">Print / Save as PDF</button>
+      <button class="btn secondary" onclick="copyAnswers()">Copy my answers as text</button>
+    </div>
+  </header>
+
+  <!-- BLOCK 1 -->
+  <section class="block">
+    <div class="block-num">01 — The four big decisions</div>
+    <h2 class="block-title">First, the things<br/>that unblock the build.</h2>
+
+    <!-- Q1 — Notifications -->
+    <div class="question">
+      <div class="q-label">How should you find out when an order comes in?</div>
+      <p class="q-hint">Pick the option that fits how you'd want to be alerted during service.</p>
+      <div class="options-stack">
+        <label class="choice">
+          <input type="radio" name="notifications" value="A" />
+          <div class="choice-body">
+            <strong>Option A — Email only · $0/mo</strong>
+            <div class="choice-detail">Instant email to you for every order. Customer gets a receipt email too.</div>
+          </div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="notifications" value="B" />
+          <div class="choice-body">
+            <strong>Option B — Email + SMS to you · ~$3–5/mo</strong>
+            <div class="choice-detail">Email plus a vibrating text to your phone. Customer still gets email only.</div>
+          </div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="notifications" value="C" />
+          <div class="choice-body">
+            <strong>Option C — Full SMS · ~$8–15/mo</strong>
+            <div class="choice-detail">You and your customers both get text confirmations.</div>
+          </div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="notifications" value="discuss" />
+          <div class="choice-body">
+            <strong>Not sure — let's talk about it</strong>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q2 — Delivery fee -->
+    <div class="question">
+      <div class="q-label">What do you currently charge for delivery?</div>
+      <p class="q-hint">The simplest move is to keep your existing fee. Just write the number you charge now.</p>
+      <div class="field-row compact">
+        <label>$</label>
+        <input type="number" name="delivery_fee" placeholder="e.g. 5" step="0.50" />
+      </div>
+
+      <div style="margin-top: 24px;">
+        <div class="q-label" style="font-size: 17px;">Want a free-delivery threshold?</div>
+        <p class="q-hint">Optional: orders over a certain amount get free delivery. Encourages bigger orders.</p>
+        <div class="options-stack">
+          <label class="choice">
+            <input type="radio" name="threshold" value="yes" />
+            <div class="choice-body">
+              <strong>Yes — free delivery over $___</strong>
+              <input type="number" name="threshold_amount" placeholder="e.g. 40" step="1" style="margin-top: 8px; max-width: 140px;" />
+            </div>
+          </label>
+          <label class="choice">
+            <input type="radio" name="threshold" value="no" />
+            <div class="choice-body"><strong>No threshold — flat fee for everyone</strong></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q3 — Palette -->
+    <div class="question">
+      <div class="q-label">The brand palette — does it feel right?</div>
+      <p class="q-hint">Cream, russet, cocoa, chive green, sour cream. See slide 6 of the deck.</p>
+      <div class="options-stack">
+        <label class="choice">
+          <input type="radio" name="palette" value="keep" />
+          <div class="choice-body"><strong>Love it — use as-is</strong></div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="palette" value="adjust" />
+          <div class="choice-body">
+            <strong>Mostly good, but:</strong>
+            <textarea name="palette_notes" placeholder="What would you adjust?" style="margin-top: 8px; min-height: 60px;"></textarea>
+          </div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="palette" value="restart" />
+          <div class="choice-body"><strong>Start over — show me other options</strong></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q4 — Logo -->
+    <div class="question">
+      <div class="q-label">Which logo direction should I develop?</div>
+      <p class="q-hint">See slide 7. I'll draw 2–3 actual options inside whichever direction you pick.</p>
+      <div class="options-stack">
+        <label class="choice">
+          <input type="radio" name="logo" value="A" />
+          <div class="choice-body">
+            <strong>A — Wordmark only</strong>
+            <div class="choice-detail">Just the truck name in a custom or hand-drawn serif. Clean, scalable.</div>
+          </div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="logo" value="B" />
+          <div class="choice-body">
+            <strong>B — Wordmark + small mark</strong>
+            <div class="choice-detail">Name plus a tiny icon (potato, fork, flame) that works as a favicon and Instagram avatar.</div>
+          </div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="logo" value="C" />
+          <div class="choice-body">
+            <strong>C — Illustrated mark</strong>
+            <div class="choice-detail">A character — smiling potato, hand-drawn truck. Most personality, hardest to keep timeless.</div>
+          </div>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOCK 2 -->
+  <section class="block">
+    <div class="block-num">02 — Homepage feel</div>
+    <h2 class="block-title">Which direction<br/>feels closer to right?</h2>
+    <div class="question">
+      <p class="q-hint">See slide 12 of the deck for the two phone mockups.</p>
+      <div class="options-stack">
+        <label class="choice">
+          <input type="radio" name="homepage" value="A" />
+          <div class="choice-body">
+            <strong>Direction A — Editorial</strong>
+            <div class="choice-detail">Quiet, restrained type. Magazine-like. Lets the food do the talking.</div>
+          </div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="homepage" value="B" />
+          <div class="choice-body">
+            <strong>Direction B — Appetite-forward</strong>
+            <div class="choice-detail">Bolder, more energetic. Makes "Order Now" the loudest thing on the page.</div>
+          </div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="homepage" value="mix" />
+          <div class="choice-body"><strong>A mix of both — let's discuss</strong></div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="homepage" value="neither" />
+          <div class="choice-body"><strong>Neither — show me another direction</strong></div>
+        </label>
+      </div>
+      <div style="margin-top: 16px;">
+        <textarea name="homepage_notes" placeholder="Any thoughts on what works or doesn't?"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOCK 4 -->
+  <section class="block">
+    <div class="block-num">03 — Content from you</div>
+    <h2 class="block-title">A few details<br/>only you can write.</h2>
+
+    <div class="question">
+      <div class="q-label">Your story</div>
+      <p class="q-hint">2–3 sentences. Why are you doing this? What makes the potatoes special? Where do you source from?</p>
+      <textarea name="story" class="tall"></textarea>
+    </div>
+
+    <div class="question">
+      <div class="q-label">Menu list with prices</div>
+      <p class="q-hint">A flat list is fine — name, price, short description if there is one. I'll organize it into categories and add-ons.</p>
+      <textarea name="menu" class="tall" placeholder="e.g.&#10;Classic Loaded — $9 — bacon, cheddar, sour cream, chives&#10;Texas BBQ — $11 — pulled pork, slaw, pickled onion&#10;..."></textarea>
+    </div>
+
+    <div class="question">
+      <div class="q-label">Catering at launch?</div>
+      <div class="options-stack">
+        <label class="choice">
+          <input type="radio" name="catering" value="yes" />
+          <div class="choice-body">
+            <strong>Yes — here are the minimums and tier pricing:</strong>
+            <textarea name="catering_details" placeholder="e.g. 25-person minimum, $15/person tier, $20/person tier..." style="margin-top: 8px; min-height: 80px;"></textarea>
+          </div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="catering" value="no" />
+          <div class="choice-body"><strong>No — hide the page for now, add it later</strong></div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="catering" value="maybe" />
+          <div class="choice-body"><strong>Maybe — let's talk it through</strong></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="q-label">Contact info for the footer</div>
+      <div class="field-row">
+        <label>Phone</label>
+        <input type="tel" name="phone" placeholder="(512) 555-0123" />
+      </div>
+      <div class="field-row">
+        <label>Order email</label>
+        <input type="email" name="email" placeholder="orders@yourtruck.com or your personal one for now" />
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="q-label">Social handles</div>
+      <div class="field-row">
+        <label>Instagram</label>
+        <input type="text" name="instagram" placeholder="@handle" />
+      </div>
+      <div class="field-row">
+        <label>TikTok</label>
+        <input type="text" name="tiktok" placeholder="@handle (if any)" />
+      </div>
+      <div class="field-row">
+        <label>Other</label>
+        <input type="text" name="other_social" placeholder="Facebook, X, etc." />
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="q-label">Allergen / dietary info</div>
+      <p class="q-hint">Which menu items are vegetarian, gluten-free, vegan, or dairy-free? Flat list is fine — I'll add tags to each menu card.</p>
+      <textarea name="allergens" class="tall"></textarea>
+    </div>
+  </section>
+
+  <!-- BLOCK 5 -->
+  <section class="block">
+    <div class="block-num">04 — A couple defaults to confirm</div>
+    <h2 class="block-title">If these sound fine,<br/>I'll just run with them.</h2>
+
+    <div class="question">
+      <div class="q-label">Sales tax — fixed 8.25%</div>
+      <p class="q-hint">Austin prepared food rate. Added at checkout, shown clearly on the receipt. Saves about $0.50/order vs. automatic calculation.</p>
+      <div class="options-stack">
+        <label class="choice">
+          <input type="radio" name="tax" value="confirm" />
+          <div class="choice-body"><strong>Sounds good — use 8.25%</strong></div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="tax" value="discuss" />
+          <div class="choice-body"><strong>Want to discuss</strong></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="q-label">Domain name purchase</div>
+      <p class="q-hint">Once you pick a truck name, I'll buy the matching domain from Cloudflare Registrar (~$10/year). I'll bill it through, or you can buy it under your own account — your call.</p>
+      <div class="options-stack">
+        <label class="choice">
+          <input type="radio" name="domain" value="bill" />
+          <div class="choice-body"><strong>You buy it, bill me back</strong></div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="domain" value="self" />
+          <div class="choice-body"><strong>I want to buy it under my own account</strong></div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="domain" value="discuss" />
+          <div class="choice-body"><strong>Discuss</strong></div>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOCK 6 -->
+  <section class="block">
+    <div class="block-num">05 — Anything else</div>
+    <h2 class="block-title">Questions, ideas,<br/>things you're worried about.</h2>
+    <div class="question">
+      <p class="q-hint">Anything that didn't fit above — features you want, sites you like, concerns about cost or timing, references for the brand. All of it.</p>
+      <textarea name="other" class="tall" style="min-height: 200px;"></textarea>
+    </div>
+  </section>
+
+  <footer class="doc-footer">
+    <h3>When you're done</h3>
+    <ul>
+      <li>Bring it to our next meeting, or</li>
+      <li>Click "Print / Save as PDF" up top, or</li>
+      <li>Click "Copy my answers as text" and paste into a text or email</li>
+    </ul>
+    <p style="margin-top: 16px; font-size: 13px; color: var(--cocoa-soft);">No need to finish every section. Whatever you answer ahead of time means we can spend our meeting on the things that actually need a conversation.</p>
+  </footer>
+
+</div>
+
+<script>
+  function copyAnswers() {
+    const form = document.querySelector('.page');
+    let out = "EDWARD'S FOOD TRUCK — RESPONSES\n";
+    out += "=".repeat(50) + "\n\n";
+
+    const blocks = form.querySelectorAll('section.block');
+    blocks.forEach((block) => {
+      const blockTitle = block.querySelector('.block-num')?.textContent || '';
+      out += `\n${blockTitle.toUpperCase()}\n`;
+      out += "-".repeat(blockTitle.length) + "\n";
+
+      const questions = block.querySelectorAll('.question');
+      questions.forEach((q) => {
+        const label = q.querySelector('.q-label')?.textContent.trim();
+        if (label) out += `\n${label}\n`;
+
+        // Radio buttons
+        const radios = q.querySelectorAll('input[type="radio"]:checked');
+        radios.forEach((r) => {
+          const lbl = r.closest('label')?.querySelector('strong')?.textContent.trim() || r.value;
+          out += `  → ${lbl}\n`;
+        });
+
+        // Text inputs and textareas
+        const textInputs = q.querySelectorAll('input[type="text"], input[type="tel"], input[type="email"], input[type="number"], textarea');
+        textInputs.forEach((inp) => {
+          if (inp.value.trim()) {
+            const name = inp.name || inp.placeholder || 'response';
+            out += `  ${name}: ${inp.value.trim()}\n`;
+          }
+        });
+      });
+    });
+
+    navigator.clipboard.writeText(out).then(() => {
+      const btn = event.target;
+      const original = btn.textContent;
+      btn.textContent = "Copied! Paste into a text or email";
+      btn.style.background = "var(--chive)";
+      btn.style.color = "var(--cream)";
+      btn.style.borderColor = "var(--chive)";
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.style.background = "";
+        btn.style.color = "";
+        btn.style.borderColor = "";
+      }, 2500);
+    }).catch(() => {
+      alert("Couldn't copy automatically. Use Print / Save as PDF instead.");
+    });
+  }
+</script>
+
+</body>
+</html>

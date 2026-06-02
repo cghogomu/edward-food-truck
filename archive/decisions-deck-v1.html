@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Edward's Food Truck — Outstanding Decisions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700;9..144,900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #FAF5EC;
+    --cream-2: #F2EADB;
+    --russet: #C56A2F;
+    --russet-deep: #A8551F;
+    --cocoa: #2A1F18;
+    --cocoa-soft: #4A3A2E;
+    --chive: #7A8B65;
+    --sour: #FFFFFF;
+    --line: rgba(42, 31, 24, 0.12);
+
+    --serif: "Fraunces", Georgia, serif;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--cream);
+    color: var(--cocoa);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .deck {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding-bottom: 96px;
+  }
+
+  .slide {
+    display: none;
+    width: 100%;
+    min-height: calc(100vh - 96px);
+    padding: 80px 48px 40px;
+    animation: fadeIn 0.35s ease;
+  }
+
+  .slide.active { display: flex; }
+
+  .slide-inner {
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+    align-self: center;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Kicker label */
+  .kicker {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--russet);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .kicker::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  h1.deck-title {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+
+  h2.slide-title {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(32px, 4.5vw, 52px);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 20px;
+    color: var(--cocoa);
+  }
+
+  h2 em {
+    color: var(--russet);
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .lead {
+    font-size: clamp(17px, 1.4vw, 19px);
+    color: var(--cocoa-soft);
+    margin-bottom: 32px;
+    max-width: 720px;
+  }
+
+  p { margin-bottom: 14px; color: var(--cocoa-soft); }
+  p.tight { margin-bottom: 6px; }
+
+  strong { color: var(--cocoa); font-weight: 600; }
+
+  /* Title slide */
+  .title-slide .slide-inner { text-align: left; }
+  .title-slide .meta {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+    color: var(--cocoa-soft);
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .title-slide .meta span strong {
+    display: block;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--russet);
+    margin-bottom: 4px;
+  }
+
+  /* Option cards */
+  .options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .option {
+    background: var(--sour);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 24px;
+    position: relative;
+  }
+  .option.recommended {
+    border-color: var(--russet);
+    border-width: 2px;
+  }
+  .option.recommended::before {
+    content: "Recommended";
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    background: var(--russet);
+    color: var(--sour);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+  .option-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--russet);
+    margin-bottom: 6px;
+  }
+  .option h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 22px;
+    margin-bottom: 12px;
+    color: var(--cocoa);
+  }
+  .option .cost {
+    display: inline-block;
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--cocoa);
+    margin: 8px 0 12px;
+  }
+  .option ul {
+    list-style: none;
+    padding: 0;
+    font-size: 14px;
+  }
+  .option ul li {
+    padding: 4px 0;
+    color: var(--cocoa-soft);
+    position: relative;
+    padding-left: 18px;
+  }
+  .option ul li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: var(--russet);
+  }
+
+  /* Two-column compare */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 28px 0;
+  }
+  .compare-col {
+    background: var(--sour);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 28px;
+  }
+  .compare-col.winner {
+    background: var(--cocoa);
+    color: var(--cream);
+    border-color: var(--cocoa);
+  }
+  .compare-col.winner h3,
+  .compare-col.winner strong { color: var(--cream); }
+  .compare-col.winner p,
+  .compare-col.winner li { color: rgba(250, 245, 236, 0.78); }
+  .compare-col.winner .tag {
+    background: var(--russet);
+    color: var(--sour);
+  }
+  .compare-col h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 26px;
+    margin-bottom: 16px;
+    color: var(--cocoa);
+  }
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--cream-2);
+    color: var(--cocoa);
+    padding: 4px 10px;
+    border-radius: 3px;
+    margin-bottom: 16px;
+  }
+  .compare-col ul { list-style: none; padding: 0; font-size: 14px; }
+  .compare-col li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    color: var(--cocoa-soft);
+  }
+  .compare-col.winner li {
+    border-bottom-color: rgba(250, 245, 236, 0.12);
+  }
+  .compare-col li:last-child { border-bottom: none; }
+
+  /* Bullet list */
+  ul.checklist {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+  }
+  ul.checklist li {
+    padding: 12px 0 12px 36px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    color: var(--cocoa-soft);
+  }
+  ul.checklist li:last-child { border-bottom: none; }
+  ul.checklist li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    top: 12px;
+    color: var(--russet);
+    font-weight: 600;
+    font-size: 18px;
+  }
+  ul.checklist li strong { display: block; color: var(--cocoa); margin-bottom: 2px; }
+
+  /* Palette swatches */
+  .palette {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .swatch {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .swatch-color {
+    height: 100px;
+  }
+  .swatch-info {
+    padding: 12px 14px;
+    background: var(--sour);
+    font-size: 12px;
+  }
+  .swatch-info strong { display: block; font-size: 13px; margin-bottom: 2px; }
+  .swatch-info code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    color: var(--cocoa-soft);
+  }
+
+  /* Callout */
+  .callout {
+    background: var(--cream-2);
+    border-left: 3px solid var(--russet);
+    padding: 16px 20px;
+    margin: 24px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .callout-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--russet);
+    margin-bottom: 6px;
+  }
+  .callout p { margin-bottom: 0; }
+
+  /* Summary table */
+  .summary-grid {
+    display: grid;
+    gap: 14px;
+    margin: 24px 0;
+  }
+  .summary-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .summary-row .phase {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--russet);
+  }
+  .summary-row .blocks { font-size: 14px; }
+  .summary-row .blocks strong { display: block; margin-bottom: 4px; color: var(--cocoa); }
+
+  /* Nav */
+  .deck-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
+    background: var(--sour);
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    z-index: 10;
+  }
+  .nav-btn {
+    background: var(--cocoa);
+    color: var(--cream);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .nav-btn:hover { background: var(--russet); }
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .nav-btn:disabled:hover { background: var(--cocoa); }
+  .counter {
+    font-family: var(--serif);
+    font-size: 16px;
+    color: var(--cocoa-soft);
+    letter-spacing: 0.05em;
+  }
+  .counter strong { color: var(--cocoa); font-weight: 600; }
+
+  /* Dot indicators */
+  .dots {
+    position: fixed;
+    top: 24px;
+    right: 32px;
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--line);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .dot.active {
+    background: var(--russet);
+    width: 18px;
+    border-radius: 3px;
+  }
+  .dot:hover { background: var(--cocoa-soft); }
+
+  /* Mobile */
+  @media (max-width: 720px) {
+    .slide { padding: 60px 24px 40px; }
+    .compare { grid-template-columns: 1fr; }
+    .summary-row { grid-template-columns: 1fr; gap: 6px; }
+    .dots { display: none; }
+    .nav-btn { padding: 8px 14px; font-size: 13px; }
+    .deck-nav { padding: 0 16px; }
+  }
+
+  /* Print */
+  @media print {
+    .deck-nav, .dots { display: none; }
+    .slide { display: flex !important; page-break-after: always; min-height: 100vh; }
+  }
+
+  /* Skin & Salt little flourish */
+  .keyline {
+    width: 48px;
+    height: 2px;
+    background: var(--russet);
+    margin-bottom: 20px;
+  }
+
+  /* === Homepage Mockups === */
+  .mockup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin: 32px 0 24px;
+    align-items: start;
+  }
+  .mockup {
+    text-align: center;
+  }
+  .mockup-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--russet);
+    margin-bottom: 16px;
+  }
+  .mockup-caption {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--cocoa-soft);
+    line-height: 1.5;
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .phone {
+    width: 260px;
+    height: 540px;
+    background: linear-gradient(145deg, #1a1410 0%, #2A1F18 100%);
+    border-radius: 38px;
+    padding: 10px;
+    margin: 0 auto;
+    box-shadow:
+      0 30px 60px -20px rgba(42, 31, 24, 0.35),
+      0 0 0 1px rgba(42, 31, 24, 0.05),
+      inset 0 0 0 2px rgba(255, 255, 255, 0.04);
+    position: relative;
+  }
+  .phone::before {
+    content: "";
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 18px;
+    background: #0d0907;
+    border-radius: 12px;
+    z-index: 5;
+  }
+  .phone-screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 30px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* --- Direction A: Editorial --- */
+  .screen-a {
+    background: var(--cream);
+  }
+  .screen-a .topbar {
+    height: 32px;
+    flex-shrink: 0;
+  }
+  .screen-a .siteheader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 18px 12px;
+    font-family: var(--serif);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--cocoa);
+    letter-spacing: 0.02em;
+  }
+  .screen-a .siteheader .menu-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .screen-a .siteheader .menu-icon span {
+    width: 16px;
+    height: 1.5px;
+    background: var(--cocoa);
+  }
+  .screen-a .hero-a {
+    flex: 1;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(42, 31, 24, 0.55) 100%),
+      url('https://images.unsplash.com/photo-1761712826074-5f1bab2b2f32?w=600&q=80&auto=format&fit=crop') center/cover,
+      linear-gradient(160deg, #D89A3A 0%, #C56A2F 50%, #7A3E18 100%);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px 18px 24px;
+    color: var(--cream);
+  }
+  .screen-a .hero-a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.25) 100%);
+    pointer-events: none;
+  }
+  .screen-a .hero-a h3 {
+    font-family: var(--serif);
+    font-size: 28px;
+    line-height: 1.05;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .screen-a .hero-a .sub {
+    font-size: 10px;
+    opacity: 0.9;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
+  }
+  .screen-a .hero-a .btn {
+    align-self: flex-start;
+    background: var(--cream);
+    color: var(--cocoa);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+    position: relative;
+    z-index: 1;
+  }
+  .screen-a .today-card {
+    background: var(--cream);
+    padding: 18px 18px 14px;
+  }
+  .screen-a .today-card .label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--russet);
+    margin-bottom: 6px;
+  }
+  .screen-a .today-card .hours {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--cocoa);
+    margin-bottom: 4px;
+  }
+  .screen-a .today-card .loc {
+    font-size: 11px;
+    color: var(--cocoa-soft);
+  }
+  .screen-a .bottom-nav {
+    background: var(--sour);
+    border-top: 1px solid rgba(42, 31, 24, 0.08);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 0 14px;
+    flex-shrink: 0;
+  }
+  .screen-a .bottom-nav .item {
+    font-size: 8px;
+    color: var(--cocoa-soft);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .screen-a .bottom-nav .item.active { color: var(--russet); font-weight: 600; }
+  .screen-a .bottom-nav .item::before {
+    content: "";
+    display: block;
+    width: 14px;
+    height: 14px;
+    margin: 0 auto 4px;
+    background: currentColor;
+    opacity: 0.6;
+    border-radius: 2px;
+  }
+
+  /* --- Direction B: Appetite-forward --- */
+  .screen-b {
+    background: var(--cream);
+  }
+  .screen-b .topbar { height: 32px; flex-shrink: 0; }
+  .screen-b .siteheader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 16px 10px;
+    background: var(--cocoa);
+    color: var(--cream);
+  }
+  .screen-b .siteheader .brand {
+    font-family: var(--serif);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .screen-b .siteheader .order-pill {
+    background: var(--russet);
+    color: var(--cream);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 5px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+  .screen-b .hero-b {
+    flex: 1;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(42, 31, 24, 0.5) 100%),
+      url('https://images.unsplash.com/photo-1552845683-cfefc701e423?w=600&q=80&auto=format&fit=crop') center/cover,
+      linear-gradient(180deg, #E8A03A 0%, #C56A2F 45%, #8B3F18 100%);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    color: var(--cream);
+    text-align: center;
+  }
+  .screen-b .hero-b::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.35) 100%);
+    pointer-events: none;
+  }
+  .screen-b .hero-b .eyebrow {
+    font-size: 8px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .screen-b .hero-b h3 {
+    font-family: var(--sans);
+    font-size: 42px;
+    line-height: 0.95;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .screen-b .hero-b .sub {
+    font-size: 10px;
+    opacity: 0.95;
+    margin-bottom: 18px;
+    max-width: 180px;
+    line-height: 1.4;
+    position: relative;
+    z-index: 1;
+  }
+  .screen-b .hero-b .cta {
+    background: var(--cream);
+    color: var(--russet-deep);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 12px 24px;
+    border-radius: 30px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+  }
+  .screen-b .menu-preview {
+    background: var(--cream);
+    padding: 14px 14px 10px;
+  }
+  .screen-b .menu-preview .h {
+    font-family: var(--serif);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cocoa);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .screen-b .menu-preview .h::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(42, 31, 24, 0.12);
+  }
+  .screen-b .menu-preview .row {
+    display: flex;
+    gap: 8px;
+  }
+  .screen-b .menu-preview .card {
+    flex: 1;
+    aspect-ratio: 1 / 1;
+    border-radius: 6px;
+    background:
+      url('https://images.unsplash.com/photo-1610631087218-f784839e48f1?w=400&q=80&auto=format&fit=crop') center/cover,
+      linear-gradient(135deg, #E8A95C 0%, #C56A2F 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .screen-b .menu-preview .card:nth-child(2) {
+    background:
+      url('https://images.unsplash.com/photo-1665931040985-88ceff0fd38e?w=400&q=80&auto=format&fit=crop') center/cover,
+      linear-gradient(135deg, #D89A3A 0%, #8B3F18 100%);
+  }
+  .screen-b .floating-nav {
+    margin: 10px 14px 14px;
+    background: var(--cocoa);
+    border-radius: 26px;
+    padding: 8px 4px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 8px 20px rgba(42, 31, 24, 0.25);
+    flex-shrink: 0;
+  }
+  .screen-b .floating-nav .pill-item {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(250, 245, 236, 0.35);
+  }
+  .screen-b .floating-nav .pill-item.active {
+    background: var(--russet);
+    width: 32px;
+    border-radius: 14px;
+  }
+
+  @media (max-width: 720px) {
+    .mockup-grid {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="dots" id="dots"></div>
+
+<div class="deck">
+
+  <!-- 1. TITLE -->
+  <section class="slide title-slide active" data-slide="1">
+    <div class="slide-inner">
+      <div class="kicker">For your review</div>
+      <div class="keyline"></div>
+      <h1 class="deck-title">Your Food<br/>Truck Website</h1>
+      <p class="lead" style="font-size: 22px; color: var(--cocoa);">A few decisions to make, and the case for Stripe.</p>
+      <div class="meta">
+        <span><strong>Cuisine</strong>Loaded potatoes</span>
+        <span><strong>Location</strong>Austin, TX</span>
+        <span><strong>Hours</strong>Mon–Fri · 10–4pm</span>
+        <span><strong>Radius</strong>10 mi delivery</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. WHY STRIPE -->
+  <section class="slide" data-slide="2">
+    <div class="slide-inner">
+      <div class="kicker">Payments · 02 of 12</div>
+      <h2 class="slide-title">Why <em>Stripe</em> for online,<br/>Heartland for in-person.</h2>
+      <p class="lead">Two systems is fine. Many small businesses run this way. Here's the breakdown:</p>
+
+      <div class="compare">
+        <div class="compare-col winner">
+          <span class="tag">Online — Stripe Checkout</span>
+          <h3>Launch in 30 minutes</h3>
+          <ul>
+            <li><strong>2.9% + $0.30</strong> per transaction, published & flat</li>
+            <li><strong>$0/month</strong> — no platform fee</li>
+            <li>Apple Pay + Google Pay built in (huge for ordering on a phone)</li>
+            <li>No phone calls, no rate negotiation, no rep</li>
+            <li>Quick to set up; widely trusted by small businesses</li>
+            <li>Automatic tax calculation available (I'll skip — see slide 11)</li>
+          </ul>
+        </div>
+        <div class="compare-col">
+          <span class="tag">In-person — Heartland (keep)</span>
+          <h3>Don't break what works</h3>
+          <ul>
+            <li>Your existing in-person card reader stays untouched</li>
+            <li>The rate you already have stays exactly the same</li>
+            <li>No retraining at the truck window</li>
+            <li>If Heartland later quotes a great online rate, adjusting or switching is fairly straightforward</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">The downside, named</div>
+        <p>You'd reconcile two systems. In practice: Stripe's dashboard handles online orders end-to-end. Heartland keeps handling the window. Reports are filed separately at tax time. This is a fair trade for launching weeks earlier.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. NOTIFICATIONS -->
+  <section class="slide" data-slide="3">
+    <div class="slide-inner">
+      <div class="kicker">Open decision · 03 of 12</div>
+      <h2 class="slide-title">How do <em>you</em><br/>find out an order came in?</h2>
+      <p class="lead">Three paths, with pricing:</p>
+
+      <div class="options">
+        <div class="option recommended">
+          <div class="option-label">Option A</div>
+          <h3>Email only</h3>
+          <div class="cost">$0/mo</div>
+          <ul>
+            <li>Resend free tier (3,000 emails/mo)</li>
+            <li>You get an instant order email</li>
+            <li>Customer gets receipt email with pickup time</li>
+            <li>You keep email visible during service — most truck owners already do</li>
+          </ul>
+        </div>
+        <div class="option">
+          <div class="option-label">Option B</div>
+          <h3>Email + SMS to you</h3>
+          <div class="cost">~$3–5/mo</div>
+          <ul>
+            <li>Resend (free) + Twilio for SMS to you only</li>
+            <li>Vibrate alert during service — hard to miss</li>
+            <li>~$1/mo base + ~$0.008/text</li>
+            <li>Easy to add later (~1 hour) if A isn't enough</li>
+          </ul>
+        </div>
+        <div class="option">
+          <div class="option-label">Option C</div>
+          <h3>Full SMS for everyone</h3>
+          <div class="cost">~$8–15/mo</div>
+          <ul>
+            <li>You AND your customers get SMS</li>
+            <li>Twilio per-text fees scale with order volume</li>
+            <li>Nice but not expected for a food truck</li>
+            <li>Customer email confirmation is the norm</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">My pick</div>
+        <p><strong>Launch with A.</strong> If emails get buried during rush, I can bolt on B in an afternoon. Don't pay for C until customers ask.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. DELIVERY FEE -->
+  <section class="slide" data-slide="4">
+    <div class="slide-inner">
+      <div class="kicker">Open decision · 04 of 12</div>
+      <h2 class="slide-title">What do you charge<br/>for delivery now?</h2>
+      <p class="lead">You already deliver, so the simplest move is to keep your current fee. Tell me what it is and I'll plug it in. If you've been thinking about changing it, here are three common shapes for a flat-fee, 10-mile radius:</p>
+
+      <div class="options">
+        <div class="option">
+          <div class="option-label">Friendly</div>
+          <h3>$5</h3>
+          <ul>
+            <li>Encourages delivery, drives volume</li>
+            <li>May be slightly under cost on far-edge addresses</li>
+            <li>Best if you want delivery to take off</li>
+          </ul>
+        </div>
+        <div class="option">
+          <div class="option-label">Balanced</div>
+          <h3>$7</h3>
+          <ul>
+            <li>Covers gas, time, and truck wear comfortably</li>
+            <li>Sustainable margin for a 10-mile round trip</li>
+            <li>Middle of the road for self-delivery</li>
+          </ul>
+        </div>
+        <div class="option">
+          <div class="option-label">Premium</div>
+          <h3>$10</h3>
+          <ul>
+            <li>"I'll deliver but pickup is preferred"</li>
+            <li>Filters to higher-value orders</li>
+            <li>Possibly suppresses demand below break-even</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Optional lever</div>
+        <p>Want a <strong>free-delivery threshold</strong> (e.g., free over $40)? Common upsell — encourages bigger orders and absorbs the fee in margin. Pick a threshold or skip for now.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. DOMAIN -->
+  <section class="slide" data-slide="5">
+    <div class="slide-inner">
+      <div class="kicker">Open item · 05 of 12</div>
+      <h2 class="slide-title">Domain name<br/>— three threads.</h2>
+
+      <ul class="checklist">
+        <li>
+          <strong>What name?</strong>
+          The domain follows the truck name. Until you pick one, I can't buy it. Blocks going live, not the build itself.
+        </li>
+        <li>
+          <strong>Where to buy?</strong>
+          Recommend <strong>Cloudflare Registrar</strong> (~$10/yr, sells at cost, no upsells). Namecheap (~$12/yr) is a fine alternative if you have an account there.
+        </li>
+        <li>
+          <strong>When to buy?</strong>
+          Same day you pick a name. Good names get sniped — domain squatters monitor new business filings in Texas.
+        </li>
+      </ul>
+
+      <div class="callout">
+        <div class="callout-label">For now</div>
+        <p>The site starts on a free temporary web address. When the real domain is bought, pointing it at the live site takes about 5 minutes. Zero rework.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. PALETTE -->
+  <section class="slide" data-slide="6">
+    <div class="slide-inner">
+      <div class="kicker">Proposal · 06 of 12</div>
+      <h2 class="slide-title">A palette pulled<br/>from the food.</h2>
+      <p class="lead">Loaded potatoes is comfort food — but the brand should feel modern, not "diner." Russet over the obvious yellow. Cocoa over pure black. Chive for freshness.</p>
+
+      <div class="palette">
+        <div class="swatch">
+          <div class="swatch-color" style="background:#FAF5EC;"></div>
+          <div class="swatch-info"><strong>Cream</strong><code>#FAF5EC</code></div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#C56A2F;"></div>
+          <div class="swatch-info"><strong>Russet</strong><code>#C56A2F</code></div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#2A1F18;"></div>
+          <div class="swatch-info" style="color:#888;"><strong style="color:var(--cocoa);">Cocoa</strong><code>#2A1F18</code></div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#7A8B65;"></div>
+          <div class="swatch-info"><strong>Chive</strong><code>#7A8B65</code></div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#FFFFFF; border-bottom:1px solid var(--line);"></div>
+          <div class="swatch-info"><strong>Sour Cream</strong><code>#FFFFFF</code></div>
+        </div>
+      </div>
+
+      <p><strong>Why this works:</strong> the palette literally references the food. Russet = the crisp golden skin. Cocoa = roasted depth. Chive = the green on top. Anyone seeing the site should feel "comfort, but considered." Yellow says fast food; russet says craft.</p>
+
+      <div class="callout">
+        <div class="callout-label">This deck IS the palette</div>
+        <p>Everything you're looking at right now uses these five colors. Tell me what to keep, what to swap, what to throw out.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. LOGO -->
+  <section class="slide" data-slide="7">
+    <div class="slide-inner">
+      <div class="kicker">Decision · 07 of 12</div>
+      <h2 class="slide-title">Logo direction<br/>— pick a lane.</h2>
+      <p class="lead">Three directions. I'll develop 2–3 options inside whichever you pick — once the truck name is locked.</p>
+
+      <div class="options">
+        <div class="option">
+          <div class="option-label">Direction A</div>
+          <h3>Wordmark only</h3>
+          <ul>
+            <li>Just the truck name in a custom or hand-drawn serif</li>
+            <li>Cleanest, scales everywhere</li>
+            <li>No mark to maintain</li>
+            <li>Risk: less recognizable as a thumbnail</li>
+          </ul>
+        </div>
+        <div class="option recommended">
+          <div class="option-label">Direction B</div>
+          <h3>Wordmark + small mark</h3>
+          <ul>
+            <li>Name + tiny icon (potato silhouette, fork, flame)</li>
+            <li>Mark = favicon + Instagram avatar</li>
+            <li>Most Austin trucks (Veracruz, Distant Relatives) use this</li>
+            <li>Best balance of versatility and personality</li>
+          </ul>
+        </div>
+        <div class="option">
+          <div class="option-label">Direction C</div>
+          <h3>Illustrated mark</h3>
+          <ul>
+            <li>Full character — smiling potato, hand-drawn truck</li>
+            <li>Maximum personality</li>
+            <li>Harder to scale, harder to update, ages faster</li>
+            <li>Risk of looking dated in 3 years</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. PHOTOGRAPHY -->
+  <section class="slide" data-slide="8">
+    <div class="slide-inner">
+      <div class="kicker">Roadmap · 08 of 12</div>
+      <h2 class="slide-title">Photography:<br/>phone first, pro later.</h2>
+      <p class="lead">Placeholders are confirmed for now. Here's the roadmap to real photos.</p>
+
+      <ul class="checklist">
+        <li>
+          <strong>Now — while the site is being built</strong>
+          Free placeholder food photography, lightly tweaked so it doesn't read as generic. I'll curate 8–12 images that match a loaded-potato aesthetic (golden, melted, herb-topped).
+        </li>
+        <li>
+          <strong>Before launch — phone shoot</strong>
+          Modern phones in good window light produce launch-quality food photos. I'll send a one-page shot list: a hero shot from above, a hero shot from the side, ingredients arranged from above, top 5 menu items, the truck exterior, and you at work.
+        </li>
+        <li>
+          <strong>Post-launch — pro shoot ($400–800)</strong>
+          Once revenue justifies it. 3-hour Austin food photographer, ~30 final shots. Replace phone shots site-wide in an hour. Worth it long-term — not worth waiting for at launch.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 9. CONTENT FROM EDWARD -->
+  <section class="slide" data-slide="9">
+    <div class="slide-inner">
+      <div class="kicker">What I need from you · 09 of 12</div>
+      <h2 class="slide-title">A few things<br/>from you.</h2>
+      <p class="lead">Doesn't block the build kicking off. Send when convenient — happy to drop these into a short questionnaire if that's easier than a free-form reply.</p>
+
+      <ul class="checklist">
+        <li><strong>The story (2–3 sentences)</strong>Why are you doing this? What makes the potatoes special? Where do you source from?</li>
+        <li><strong>Menu list with prices</strong>A flat list is fine — I'll organize it into categories and add-ons.</li>
+        <li><strong>Catering at launch — yes or no?</strong>If no, I'll leave the page off for now and add it later. If yes, I'll need minimums and tier pricing.</li>
+        <li><strong>Contact</strong>Phone number for the footer, email address for receiving orders.</li>
+        <li><strong>Social handles</strong>Instagram, TikTok if applicable.</li>
+        <li><strong>Allergen / dietary info</strong>Which items are vegetarian, gluten-free, vegan, dairy-free. Goes on each menu card.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 10. SALES TAX -->
+  <section class="slide" data-slide="10">
+    <div class="slide-inner">
+      <div class="kicker">Decision · 10 of 12</div>
+      <h2 class="slide-title">Sales tax —<br/>fixed or auto?</h2>
+      <p class="lead">Tax added at checkout, confirmed. Austin prepared food rate: <strong>8.25%</strong> (6.25% TX state + 2% Austin/Travis County). Two ways to implement:</p>
+
+      <div class="compare">
+        <div class="compare-col winner">
+          <span class="tag">Recommended</span>
+          <h3>Fixed at 8.25%</h3>
+          <ul>
+            <li>Free — no per-order fee</li>
+            <li>Calculated in the cart before checkout</li>
+            <li>Shown clearly on the receipt as its own line</li>
+            <li>Works perfectly for Austin-only delivery (which is your case)</li>
+            <li>If the rate ever changes, easy to update</li>
+          </ul>
+        </div>
+        <div class="compare-col">
+          <span class="tag">Alternative</span>
+          <h3>Stripe Tax</h3>
+          <ul>
+            <li>Auto-calculates based on customer address</li>
+            <li><strong>$0.50 per order</strong> on top of the 2.9% + $0.30</li>
+            <li>Worth it only if you ever deliver outside Austin tax jurisdiction</li>
+            <li>Overkill for a 10-mile radius inside one city</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Default</div>
+        <p>Going with the fixed rate unless you flag otherwise. Saves you $0.50/order forever — meaningful at 50+ orders/week.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. SUMMARY -->
+  <section class="slide" data-slide="11">
+    <div class="slide-inner">
+      <div class="kicker">Summary · 11 of 12</div>
+      <h2 class="slide-title">What's blocking<br/><em>what.</em></h2>
+
+      <div class="summary-grid">
+        <div class="summary-row">
+          <div class="phase">Kickoff</div>
+          <div class="blocks">
+            <strong>Nothing blocks getting started.</strong>
+            Build begins as soon as you say go.
+          </div>
+        </div>
+        <div class="summary-row">
+          <div class="phase">Brand &amp; story</div>
+          <div class="blocks">
+            <strong>Marketing pages need:</strong>
+            Brand color approval (slide 6) · logo direction (slide 7) · your story (slide 9)
+          </div>
+        </div>
+        <div class="summary-row">
+          <div class="phase">Ordering</div>
+          <div class="blocks">
+            <strong>Order flow needs:</strong>
+            Notification choice — A, B, or C (slide 3) · delivery fee amount (slide 4)
+          </div>
+        </div>
+        <div class="summary-row">
+          <div class="phase">Launch</div>
+          <div class="blocks">
+            <strong>Cannot go live without:</strong>
+            Iron Oaks domain · phone-shot photos · Stripe account (you — 10 min) · final menu with prices
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Next step</div>
+        <p>Send back your picks on slides 3, 4, 6, and 7. Everything else can be answered along the way.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. VISUAL PREVIEW -->
+  <section class="slide" data-slide="12">
+    <div class="slide-inner">
+      <div class="kicker">Visual preview · 12 of 12</div>
+      <h2 class="slide-title">A taste of<br/>the homepage.</h2>
+      <p class="lead">Two directions for how the homepage could feel, both built on the palette from slide 6. Real photos, final type, and finishing touches come once you pick a direction.</p>
+
+      <div class="mockup-grid">
+
+        <!-- Direction A: Editorial -->
+        <div class="mockup">
+          <div class="mockup-label">Direction A · Editorial</div>
+          <div class="phone">
+            <div class="phone-screen screen-a">
+              <div class="topbar"></div>
+              <div class="siteheader">
+                <span>Iron Oaks</span>
+                <div class="menu-icon"><span></span><span></span><span></span></div>
+              </div>
+              <div class="hero-a">
+                <h3>Comfort,<br/>loaded.</h3>
+                <div class="sub">Mon–Fri · 10–4 · Austin</div>
+                <div class="btn">Order →</div>
+              </div>
+              <div class="today-card">
+                <div class="label">Today</div>
+                <div class="hours">Mon · 10am – 4pm</div>
+                <div class="loc">South Lamar &amp; Bouldin</div>
+              </div>
+              <div class="bottom-nav">
+                <div class="item active">Home</div>
+                <div class="item">Menu</div>
+                <div class="item">Order</div>
+                <div class="item">Visit</div>
+              </div>
+            </div>
+          </div>
+          <p class="mockup-caption">Restrained, magazine-like. Quiet type, generous space, lets the food do the talking.</p>
+        </div>
+
+        <!-- Direction B: Appetite-forward -->
+        <div class="mockup">
+          <div class="mockup-label">Direction B · Appetite-forward</div>
+          <div class="phone">
+            <div class="phone-screen screen-b">
+              <div class="topbar"></div>
+              <div class="siteheader">
+                <span class="brand">IRON OAKS</span>
+                <span class="order-pill">Order</span>
+              </div>
+              <div class="hero-b">
+                <div class="eyebrow">Loaded Potatoes · Austin</div>
+                <h3>LOADED.<br/>PERIOD.</h3>
+                <div class="sub">Hand-crafted potatoes the way they're supposed to be.</div>
+                <div class="cta">Order Now</div>
+              </div>
+              <div class="menu-preview">
+                <div class="h">Favorites</div>
+                <div class="row">
+                  <div class="card"></div>
+                  <div class="card"></div>
+                </div>
+              </div>
+              <div class="floating-nav">
+                <div class="pill-item active"></div>
+                <div class="pill-item"></div>
+                <div class="pill-item"></div>
+                <div class="pill-item"></div>
+              </div>
+            </div>
+          </div>
+          <p class="mockup-caption">Bolder, more energetic. Makes "Order Now" the loudest thing on the page.</p>
+        </div>
+
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Heads up</div>
+        <p>The food photos here are free stock images that fit the loaded-potato vibe. Your real photos will replace them before launch. Once you pick a direction, I'll build a full clickable mockup so you can tap through it.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<nav class="deck-nav">
+  <button class="nav-btn" id="prev">← Previous</button>
+  <div class="counter"><strong id="current">1</strong> / <span id="total">12</span></div>
+  <button class="nav-btn" id="next">Next →</button>
+</nav>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  const currentEl = document.getElementById('current');
+  const totalEl = document.getElementById('total');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const dotsEl = document.getElementById('dots');
+
+  totalEl.textContent = total;
+  let current = 1;
+
+  // Build dot indicators
+  for (let i = 1; i <= total; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 1 ? ' active' : '');
+    dot.setAttribute('data-target', i);
+    dot.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(dot);
+  }
+
+  function goTo(n) {
+    if (n < 1 || n > total) return;
+    slides.forEach(s => s.classList.remove('active'));
+    document.querySelector(`.slide[data-slide="${n}"]`).classList.add('active');
+    document.querySelectorAll('.dot').forEach(d => {
+      d.classList.toggle('active', parseInt(d.dataset.target) === n);
+    });
+    current = n;
+    currentEl.textContent = n;
+    prevBtn.disabled = n === 1;
+    nextBtn.disabled = n === total;
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(current - 1); }
+    if (e.key === 'Home') { e.preventDefault(); goTo(1); }
+    if (e.key === 'End') { e.preventDefault(); goTo(total); }
+  });
+
+  goTo(1);
+</script>
+
+</body>
+</html>
