@@ -1,6 +1,15 @@
 # Edward's Food Truck — TODO
 
-Live site: https://edward-food-truck.vercel.app
+## 🔗 Live links — share these with Edward
+
+| What | URL | Notes |
+|------|-----|-------|
+| **🍴 Public site** | **https://edward-food-truck.vercel.app** | The customer-facing site — menu, ordering, hours, "are we open?" status. |
+| **🎛️ Truck dashboard** | **https://edward-food-truck.vercel.app/dashboard** | Edward's control panel — mark sold out, set inventory, toggle the delivery banner, add catering/closure dates. Changes show on the public site instantly. Password: `ironoaks` |
+
+> **The dashboard is the key thing to demo for Edward** — it's what lets him run
+> the live site himself (inventory, sold-out, catering calendar) with no code.
+
 Repo: https://github.com/cghogomu/edward-food-truck (`master` → auto-deploys to Vercel)
 
 ## Done
@@ -17,11 +26,11 @@ Repo: https://github.com/cghogomu/edward-food-truck (`master` → auto-deploys t
 - [x] Fix Redis env-var detection (Vercel injects `KV_REST_API_*`, not
       `UPSTASH_REDIS_REST_*`)
 - [x] Verify end-to-end: dashboard toggle → saved to Redis → shown on public site
+- [x] Fix open/closed status to use Austin time (`America/Chicago`) instead of the
+      UTC server clock, so hours are correct in production
 
 ## To do
 
-- [ ] **Reset dashboard to "open"** — the site was left "sold out" from testing.
-      Go to /dashboard (password `ironoaks`) → "Re-open · reset to full".
 - [ ] **Stripe test-mode checkout** (optional, for a working demo order):
   - [ ] Create Stripe test keys; add `STRIPE_SECRET_KEY` in Vercel env vars
   - [ ] Set `NEXT_PUBLIC_BASE_URL` to the live URL (needed only for Stripe
