@@ -52,21 +52,41 @@ export async function patchSiteState(
   return next;
 }
 
-const DAY_LOOKUP = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+// The truck operates in Austin, TX. Hours, day-of-week, and "today" must be
+// evaluated in that timezone — otherwise the deployed server (which runs in
+// UTC on Vercel) compares against the wrong clock and reports the wrong open
+// status (e.g. "Closed right now" during real business hours).
+const TRUCK_TZ = "America/Chicago";
+
+function truckNow(): { dateKey: string; day: string; minutes: number } {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: TRUCK_TZ,
+    weekday: "short",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date());
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  // `hour12: false` can emit "24" at midnight in some runtimes — normalize it.
+  const hour = get("hour") === "24" ? 0 : Number(get("hour"));
+  return {
+    dateKey: `${get("year")}-${get("month")}-${get("day")}`,
+    day: get("weekday"),
+    minutes: hour * 60 + Number(get("minute")),
+  };
+}
 
 function todayKey(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}-${String(d.getDate()).padStart(2, "0")}`;
+  return truckNow().dateKey;
 }
 
 function isWithinHours(open: string, close: string): boolean {
-  const now = new Date();
   const [oh, om] = open.split(":").map(Number);
   const [ch, cm] = close.split(":").map(Number);
-  const minutes = now.getHours() * 60 + now.getMinutes();
+  const minutes = truckNow().minutes;
   return minutes >= oh * 60 + om && minutes < ch * 60 + cm;
 }
 
@@ -101,8 +121,7 @@ export function deriveOpenStatus(state: SiteState): OpenStatus {
     };
   }
 
-  const today = new Date();
-  const dayName = DAY_LOOKUP[today.getDay()];
+  const dayName = truckNow().day;
   const isOperatingDay = state.hours.days.includes(dayName);
 
   if (!isOperatingDay && todayEntry?.kind !== "open") {
