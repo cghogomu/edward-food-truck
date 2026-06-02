@@ -10,7 +10,12 @@ const STATE_KEY = "edward-food-truck:site-state";
 // Hosts like Vercel run on a read-only filesystem, so file writes silently
 // fail there. When Upstash Redis env vars are present we persist to Redis;
 // otherwise (local dev) we fall back to the JSON file on disk.
-const redis = process.env.UPSTASH_REDIS_REST_URL ? Redis.fromEnv() : null;
+// `Redis.fromEnv()` accepts either the `UPSTASH_REDIS_REST_*` names or the
+// `KV_REST_API_*` names that Vercel's Upstash integration injects, so we
+// gate on both here too.
+const hasRedis =
+  process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+const redis = hasRedis ? Redis.fromEnv() : null;
 
 async function readSeed(): Promise<SiteState> {
   const raw = await fs.readFile(STATE_FILE, "utf-8");
