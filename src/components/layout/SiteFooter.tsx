@@ -54,7 +54,7 @@ export function SiteFooter() {
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-(--text-muted)">
           <div>© {new Date().getFullYear()} Iron Oaks</div>
           <div>
-            Built by{" "}
+            Designed and built by{" "}
             <a
               href={SETTINGS.credits.builderUrl}
               target="_blank"
@@ -62,6 +62,7 @@ export function SiteFooter() {
               className="text-(--amber) hover:text-(--text) underline-offset-4 hover:underline"
             >
               {SETTINGS.credits.builder}
+              <svg width="13" height="13" viewBox="0 0 100 100" fill="none" stroke="currentColor" aria-hidden="true" className="ml-1.5 inline-block align-[-2px]"><polygon points="50,22 78,50 50,78 22,50" strokeWidth="7" strokeLinejoin="round" /><circle cx="50" cy="50" r="8" strokeWidth="7" /></svg>
             </a>
           </div>
         </div>

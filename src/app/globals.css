@@ -92,3 +92,31 @@ html { -webkit-text-size-adjust: 100%; }
 @media (max-width: 768px) {
   body { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
 }
+
+/* -------- PHOTO STRIP (auto-scrolling marquee) -------- */
+.photo-strip { overflow: hidden; }
+.strip-track {
+  display: flex;
+  gap: 14px;
+  width: max-content;
+  animation: strip-scroll 60s linear infinite;
+}
+@keyframes strip-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.strip-tile {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(180px, 22vw, 300px);
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 14px;
+  background-color: var(--bg-card);
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--border);
+}
+@media (prefers-reduced-motion: reduce) {
+  .strip-track { animation: none; }
+}

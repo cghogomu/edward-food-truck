@@ -2,37 +2,60 @@ export type SpotlightPartner = {
   name: string;
   category: string;
   blurb: string;
+  location?: string;
   url?: string;
   placeholder?: boolean;
 };
 
 export const HOST_BUSINESS = {
-  name: "Host business",
+  name: "Construction Specialties",
   blurb:
-    "(Placeholder for the company that lets Iron Oaks park on their property. Edward wants to publicly thank them and send business their way — we'll plug in the real name, a short blurb, and a link once it's confirmed.)",
-  placeholder: true,
+    "Construction Specialties is a family-owned shop that's spent 30-plus years selling and fixing tools for this community — the kind of place pros and weekend homeowners both trust, with a 4.5-star Google rating to prove it. They give us a corner to park on. The least we can do is point good people their way.",
+  url: "https://conspecs.com/",
 };
+
+// Description placeholder shared until Edward writes each one up.
+const PARTNER_BLURB_TODO = "Description coming soon";
 
 export const COMMUNITY_PARTNERS: SpotlightPartner[] = [
   {
-    name: "Local lemonade vendor",
+    name: "Fraga's Barbershop",
+    category: "Barber",
+    location: "Pflugerville",
+    blurb: PARTNER_BLURB_TODO,
+    placeholder: true,
+  },
+  {
+    name: "Dutch Bros",
+    category: "Coffee",
+    location: "Parmer Ln & Wells Branch",
+    blurb: PARTNER_BLURB_TODO,
+    placeholder: true,
+  },
+  {
+    name: "Botanic Bliss",
+    category: "Cafe",
+    location: "Pflugerville",
+    blurb: PARTNER_BLURB_TODO,
+    placeholder: true,
+  },
+  {
+    name: "Jimmy's Auto Repair",
+    category: "Auto Repair",
+    location: "Austin",
+    blurb: PARTNER_BLURB_TODO,
+    placeholder: true,
+  },
+  {
+    name: "Tony's Mobile Repair",
+    category: "Mobile Mechanic",
+    blurb: PARTNER_BLURB_TODO,
+    placeholder: true,
+  },
+  {
+    name: "Matt's Lifted Lemonades",
     category: "Drinks",
-    blurb:
-      "(Placeholder partner — a real one Edward already works with to be plugged in.)",
-    placeholder: true,
-  },
-  {
-    name: "Local baker",
-    category: "Sweets",
-    blurb:
-      "(Placeholder partner — pies, cookies, or whatever Edward's collaborator is making.)",
-    placeholder: true,
-  },
-  {
-    name: "Local barber / mechanic / service",
-    category: "Services",
-    blurb:
-      "(Placeholder partner — folks who keep the rest of life going.)",
+    blurb: PARTNER_BLURB_TODO,
     placeholder: true,
   },
 ];

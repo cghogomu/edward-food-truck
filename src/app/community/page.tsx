@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { COMMUNITY_PARTNERS, COMMUNITY_VALUE, HOST_BUSINESS } from "@/content/spotlight";
+import { SETTINGS } from "@/content/settings";
 
 export default function CommunityPage() {
   return (
@@ -26,14 +27,34 @@ export default function CommunityPage() {
           <h2 className="font-serif text-3xl sm:text-4xl text-(--text) mb-4">
             Thanks to {HOST_BUSINESS.name}
           </h2>
-          <p className="text-(--text-soft) leading-relaxed max-w-2xl">
+          <p className="text-(--text-soft) leading-relaxed max-w-2xl mb-7">
             {HOST_BUSINESS.blurb}
           </p>
-          {HOST_BUSINESS.placeholder && (
-            <p className="mt-4 text-xs text-(--text-muted) italic">
-              Placeholder — real name and link to be added.
-            </p>
-          )}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 pt-6 border-t border-(--color-line)">
+            <div className="text-sm leading-relaxed">
+              <div className="text-(--text) font-medium">{SETTINGS.location.venue}</div>
+              <div className="text-(--text-soft)">{SETTINGS.location.street}</div>
+              <div className="text-(--text-soft)">{SETTINGS.location.cityState}</div>
+            </div>
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              <a
+                href={SETTINGS.location.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-(--amber) hover:text-(--text) text-sm font-medium transition-colors"
+              >
+                Get directions →
+              </a>
+              <a
+                href={HOST_BUSINESS.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-(--amber) hover:text-(--text) text-sm font-medium transition-colors"
+              >
+                Visit their site →
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -58,17 +79,17 @@ export default function CommunityPage() {
               <div className="text-xs uppercase tracking-[0.15em] font-semibold text-(--amber) mb-2">
                 {partner.category}
               </div>
-              <h3 className="font-serif text-xl text-(--text) mb-3">
+              <h3 className={`font-serif text-xl text-(--text) ${partner.location ? "mb-1" : "mb-3"}`}>
                 {partner.name}
               </h3>
+              {partner.location && (
+                <div className="text-xs text-(--text-muted) mb-3">
+                  {partner.location}
+                </div>
+              )}
               <p className="text-(--text-soft) text-sm leading-relaxed">
                 {partner.blurb}
               </p>
-              {partner.placeholder && (
-                <p className="mt-3 text-xs text-(--text-muted) italic">
-                  Placeholder partner.
-                </p>
-              )}
             </div>
           ))}
         </div>

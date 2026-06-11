@@ -3,10 +3,10 @@ import type { MenuItem } from "@/types";
 export const MENU: MenuItem[] = [
   {
     id: "brisket",
-    name: "Brisket Baked Potato",
+    name: "Brisket Loaded Baked Potato",
     description:
       "Hot baked potato with a quarter pound of slow-smoked prime Texas brisket — butter, cheese, sour cream, BBQ sauce, green onions, and sriracha.",
-    price: 17,
+    price: 15,
     image: "/menu/brisket-baked-potato.jpg",
     tags: ["Signature"],
     modifiers: [
@@ -19,10 +19,10 @@ export const MENU: MenuItem[] = [
   },
   {
     id: "chicken-bacon-ranch",
-    name: "Chicken Bacon Ranch Baked Potato",
+    name: "Chicken Bacon Ranch Loaded Baked Potato",
     description:
       "Hot baked potato with a quarter pound of fire-grilled chicken — smoked bacon, butter, cheese, homemade ranch, jalapeños, green onions, and sriracha.",
-    price: 17,
+    price: 15,
     image:
       "https://images.unsplash.com/photo-1761712826074-5f1bab2b2f32?w=900&q=80&auto=format&fit=crop",
     tags: ["Signature"],
@@ -36,13 +36,38 @@ export const MENU: MenuItem[] = [
     ],
   },
   {
-    id: "coming-soon",
-    name: "Coming soon",
-    description: "A third loaded potato dropping by grand opening. Stay tuned.",
-    price: 0,
+    id: "breakfast-burrito",
+    name: "Breakfast Burrito",
+    description:
+      "Scrambled eggs, melted cheese, and your choice of meat wrapped in a warm flour tortilla — a hearty way to start the day.",
+    price: 10,
+    image: "/menu/breakfast-burrito.png",
+  },
+  {
+    id: "sausage-wrap",
+    name: "Sausage Wrap",
+    description:
+      "A grilled sausage tucked into a soft, warm tortilla — simple, savory, and ready to go.",
+    price: 5,
+    image: "/menu/sausage-wrap.png",
+  },
+  {
+    id: "cookies",
+    name: "Cookies",
+    description: "Soft-baked and made fresh. The right way to finish.",
+    price: 2,
     image:
-      "https://images.unsplash.com/photo-1610631087218-f784839e48f1?w=900&q=80&auto=format&fit=crop",
-    comingSoon: true,
+      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=900&q=80&auto=format&fit=crop",
+    category: "extra",
+  },
+  {
+    id: "can-drink",
+    name: "Can Drink",
+    description: "An ice-cold can to wash it all down.",
+    price: 2,
+    image:
+      "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=900&q=80&auto=format&fit=crop",
+    category: "extra",
   },
 ];
 

@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Meridian Works deliverables — business docs, not part of the site
+Iron-Oaks-Care-Plan.html
+Iron-Oaks-Care-Plan.md

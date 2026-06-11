@@ -4,7 +4,7 @@ import { getSiteState, deriveOpenStatus } from "@/lib/state";
 import { OpenStatusHero } from "@/components/OpenStatusHero";
 import { MENU } from "@/content/menu";
 import { SETTINGS } from "@/content/settings";
-import { COMMUNITY_VALUE, HOST_BUSINESS } from "@/content/spotlight";
+import { PhotoStrip } from "@/components/PhotoStrip";
 
 export default async function Home() {
   const state = await getSiteState();
@@ -33,7 +33,7 @@ export default async function Home() {
           />
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 pt-12 sm:pt-20 pb-16 sm:pb-24">
+        <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 pt-10 sm:pt-16 pb-12 sm:pb-16">
           <div className="max-w-2xl">
             <p className="text-(--amber) text-xs uppercase tracking-[0.18em] font-semibold mb-5">
               {SETTINGS.brand.tagline}
@@ -54,19 +54,36 @@ export default async function Home() {
           <div className="mt-10 max-w-2xl">
             <OpenStatusHero status={status} />
           </div>
+
+          <div className="mt-6 max-w-2xl text-(--text-soft)">
+            <span className="text-(--text) font-medium">Come visit us</span> —{" "}
+            {SETTINGS.location.venue}, {SETTINGS.location.street},{" "}
+            {SETTINGS.location.cityState}.{" "}
+            <a
+              href={SETTINGS.location.mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-(--amber) hover:text-(--text) font-medium transition-colors whitespace-nowrap"
+            >
+              Get directions →
+            </a>
+          </div>
         </div>
       </section>
 
+      {/* PHOTO STRIP */}
+      <PhotoStrip />
+
       {/* SIGNATURES */}
-      <section className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24">
+      <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 sm:py-14">
         <div className="flex items-end justify-between mb-10 sm:mb-12 gap-4">
           <div>
             <p className="text-(--amber) text-xs uppercase tracking-[0.18em] font-semibold mb-3">
               The menu
             </p>
             <h2 className="font-serif text-3xl sm:text-5xl leading-tight">
-              Two potatoes.<br />
-              <em className="text-(--text-soft) not-italic">A third on the way.</em>
+              Loaded baked potatoes.<br />
+              <em className="text-(--text-soft) not-italic">Always done the right way.</em>
             </h2>
           </div>
           <Link
@@ -112,43 +129,8 @@ export default async function Home() {
         </Link>
       </section>
 
-      {/* COMMUNITY */}
-      <section className="bg-(--bg-raised) border-y border-(--color-line)">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-16 sm:py-24 grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <p className="text-(--amber) text-xs uppercase tracking-[0.18em] font-semibold mb-3">
-              We are all we got
-            </p>
-            <h2 className="font-serif text-3xl sm:text-4xl leading-tight mb-5">
-              The street eats together.
-            </h2>
-            <p className="text-(--text-soft) leading-relaxed mb-6">
-              {COMMUNITY_VALUE}
-            </p>
-            <Link
-              href="/community"
-              className="inline-block text-(--amber) hover:text-(--text) text-sm font-medium transition-colors"
-            >
-              Meet our partners →
-            </Link>
-          </div>
-
-          <div className="bg-(--bg-card) rounded-2xl border border-(--color-line) p-7">
-            <p className="text-xs uppercase tracking-[0.18em] font-semibold text-(--amber) mb-3">
-              We park here thanks to
-            </p>
-            <p className="font-serif text-2xl text-(--text) mb-3">
-              {HOST_BUSINESS.name}
-            </p>
-            <p className="text-(--text-soft) text-sm leading-relaxed">
-              {HOST_BUSINESS.blurb}
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* STORY TEASE */}
-      <section className="max-w-3xl mx-auto px-5 sm:px-8 py-20 text-center">
+      <section className="max-w-3xl mx-auto px-5 sm:px-8 py-12 sm:py-16 text-center">
         <p className="text-(--amber) text-xs uppercase tracking-[0.18em] font-semibold mb-4">
           The shop
         </p>

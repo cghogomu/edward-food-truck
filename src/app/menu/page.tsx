@@ -10,6 +10,9 @@ export default async function MenuPage() {
   const status = deriveOpenStatus(state);
   const orderable = status.state === "open" || status.state === "low";
 
+  const cards = MENU.filter((item) => item.category !== "extra");
+  const extras = MENU.filter((item) => item.category === "extra");
+
   return (
     <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12 sm:py-20">
       <header className="mb-10 sm:mb-14 flex flex-wrap items-end justify-between gap-5">
@@ -33,21 +36,21 @@ export default async function MenuPage() {
       )}
 
       <div className="space-y-12 sm:space-y-16">
-        {MENU.map((item) => (
+        {cards.map((item) => (
           <article
             key={item.id}
             className={`grid sm:grid-cols-5 gap-7 sm:gap-10 items-start ${item.comingSoon ? "opacity-60" : ""}`}
           >
-            <div className="sm:col-span-3 relative aspect-[5/4] rounded-2xl overflow-hidden bg-(--bg-card) border border-(--color-line)">
+            <div className="sm:col-span-2 relative aspect-[5/4] rounded-2xl overflow-hidden bg-(--bg-card) border border-(--color-line)">
               <Image
                 src={item.image}
                 alt={item.name}
                 fill
-                sizes="(max-width: 640px) 100vw, 60vw"
+                sizes="(max-width: 640px) 100vw, 40vw"
                 className="object-cover"
               />
             </div>
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-3">
               <div className="flex items-baseline justify-between gap-4 mb-3">
                 <h2 className="font-serif text-3xl text-(--text) leading-tight">
                   {item.name}
@@ -82,6 +85,35 @@ export default async function MenuPage() {
           </article>
         ))}
       </div>
+
+      {extras.length > 0 && (
+        <div className="mt-14 sm:mt-16">
+          <h2 className="font-serif text-2xl sm:text-3xl text-(--text) mb-5">
+            Sides &amp; Drinks
+          </h2>
+          <div className="bg-(--bg-card) border border-(--color-line) rounded-2xl divide-y divide-(--color-line)">
+            {extras.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between gap-4 px-5 py-4 sm:px-6 sm:py-5"
+              >
+                <div className="min-w-0">
+                  <div className="flex items-baseline gap-3">
+                    <span className="font-serif text-lg text-(--text)">{item.name}</span>
+                    <span className="text-(--amber) font-medium">${item.price}</span>
+                  </div>
+                  <p className="text-(--text-soft) text-sm mt-0.5">{item.description}</p>
+                </div>
+                {orderable && (
+                  <div className="shrink-0 w-24 sm:w-28">
+                    <AddToCartButton item={item} />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mt-20 pt-12 border-t border-(--color-line) text-center">
         <p className="text-(--text-soft) mb-4">

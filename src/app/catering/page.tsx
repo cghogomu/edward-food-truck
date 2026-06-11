@@ -4,7 +4,7 @@ import { useState } from "react";
 import { SETTINGS } from "@/content/settings";
 
 const SMALL_BUNDLE = {
-  price: 17,
+  price: 15,
   includes: [
     "Pick any item on the menu — guests choose their own",
     "Plates, napkins, utensils",

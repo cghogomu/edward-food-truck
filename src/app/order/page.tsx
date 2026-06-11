@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useCart, expandLine, modifierLabels } from "@/lib/cart";
 import { isDeliverable, DELIVERY_ZIPS } from "@/content/zips";
 import { SETTINGS } from "@/content/settings";
@@ -12,8 +11,7 @@ import { DeliveryAreaMap } from "@/components/DeliveryAreaMap";
 type Mode = "pickup" | "delivery";
 
 export default function OrderPage() {
-  const router = useRouter();
-  const { lines, hydrated, updateQty, remove, clear, itemCount, subtotal } = useCart();
+  const { lines, hydrated, updateQty, remove, itemCount, subtotal } = useCart();
   const [mode, setMode] = useState<Mode>("pickup");
   const [address, setAddress] = useState("");
   const [zip, setZip] = useState("");
@@ -21,7 +19,6 @@ export default function OrderPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
-  const [submitting, setSubmitting] = useState(false);
 
   const tax = subtotal * SETTINGS.ordering.salesTaxRate;
   const deliveryFee =
@@ -38,61 +35,6 @@ export default function OrderPage() {
     phone.trim().length > 0 &&
     (mode === "pickup" ||
       (address.trim().length > 0 && zip.trim().length === 5 && zipValid));
-
-  async function placeOrder() {
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          lines,
-          mode,
-          name,
-          phone,
-          pickupTime,
-          address,
-          zip,
-          notes,
-        }),
-      });
-
-      if (!res.ok) {
-        const { error } = await res.json().catch(() => ({ error: "Checkout failed." }));
-        alert(error || "Checkout failed. Please try again.");
-        setSubmitting(false);
-        return;
-      }
-
-      const data = (await res.json()) as
-        | { configured: true; url: string; orderNumber: string }
-        | { configured: false };
-
-      if (data.configured && data.url) {
-        // Stripe wired up — hand off to hosted checkout. The success page will
-        // pick up the session via ?session_id=... and clear the cart there.
-        sessionStorage.setItem(
-          "iron-oaks-last-order",
-          JSON.stringify({ orderNumber: data.orderNumber, mode, total, name, pickupTime })
-        );
-        window.location.href = data.url;
-        return;
-      }
-
-      // Stripe not configured yet — keep the concept demo working.
-      await new Promise((r) => setTimeout(r, 400));
-      const orderNumber = `IO-${Date.now().toString().slice(-6)}`;
-      sessionStorage.setItem(
-        "iron-oaks-last-order",
-        JSON.stringify({ orderNumber, mode, total, name, pickupTime })
-      );
-      clear();
-      router.push("/order/success");
-    } catch {
-      alert("Couldn't reach the server. Please try again.");
-      setSubmitting(false);
-    }
-  }
 
   if (!hydrated) {
     return <div className="max-w-3xl mx-auto px-5 py-20 text-(--text-soft)">Loading your order…</div>;
@@ -324,15 +266,27 @@ export default function OrderPage() {
               </div>
             </div>
 
-            <button
-              onClick={placeOrder}
-              disabled={!canCheckout || submitting}
-              className="mt-6 w-full bg-(--russet) hover:bg-(--russet-deep) text-(--text) py-4 rounded-lg text-sm font-semibold tracking-wide uppercase disabled:bg-(--bg) disabled:text-(--text-muted) disabled:cursor-not-allowed transition-colors"
-            >
-              {submitting ? "Placing order…" : `Place order · $${total.toFixed(2)}`}
-            </button>
+            {canCheckout ? (
+              <a
+                href={SETTINGS.ordering.paymentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 block w-full text-center bg-(--russet) hover:bg-(--russet-deep) text-(--text) py-4 rounded-lg text-sm font-semibold tracking-wide uppercase transition-colors"
+              >
+                Order &amp; Pay Online · ${total.toFixed(2)}
+              </a>
+            ) : (
+              <button
+                disabled
+                className="mt-6 w-full bg-(--bg) text-(--text-muted) py-4 rounded-lg text-sm font-semibold tracking-wide uppercase cursor-not-allowed"
+              >
+                {mode === "delivery"
+                  ? "Add your details to continue"
+                  : "Add your name & phone to continue"}
+              </button>
+            )}
             <p className="mt-3 text-xs text-(--text-muted) text-center">
-              This is a concept demo — no real card is charged.
+              You'll finish payment on our secure payment page.
             </p>
           </section>
         </div>

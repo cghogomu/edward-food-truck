@@ -1,4 +1,5 @@
 import { getSiteState } from "@/lib/state";
+import { SETTINGS } from "@/content/settings";
 import type { CalendarEntry } from "@/types";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -73,6 +74,19 @@ export default async function CalendarPage() {
           catering, you&apos;ll see who for — that way you know to book ahead, and
           you know who&apos;s lucky enough to be feeding their team that day.
         </p>
+        <div className="mt-5 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-sm">
+          <span className="text-(--text)">
+            {SETTINGS.location.venue} · {SETTINGS.location.street}, {SETTINGS.location.cityState}
+          </span>
+          <a
+            href={SETTINGS.location.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-(--amber) hover:text-(--text) font-medium transition-colors"
+          >
+            Get directions →
+          </a>
+        </div>
       </header>
 
       {/* Month label + legend */}

@@ -45,6 +45,8 @@ export type MenuItem = {
     price?: number;
   }>;
   comingSoon?: boolean;
+  // "extra" items (sides, drinks) render in a compact list instead of a photo card.
+  category?: "extra";
 };
 
 export type CartLine = {
