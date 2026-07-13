@@ -69,7 +69,7 @@ export function MobileBottomNav() {
   const { itemCount, hydrated } = useCart();
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-(--bg-raised)/95 backdrop-blur-md border-t border-(--color-line)"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-(--bg)/95 backdrop-blur-md"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-label="Primary"
     >

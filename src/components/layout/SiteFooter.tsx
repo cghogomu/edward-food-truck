@@ -3,7 +3,7 @@ import { SETTINGS } from "@/content/settings";
 
 export function SiteFooter() {
   return (
-    <footer className="bg-(--bg-raised) border-t border-(--color-line) mt-20">
+    <footer className="pt-20" style={{ background: "rgba(5,7,6,0.65)" }}>
       <div className="max-w-6xl mx-auto px-5 sm:px-8 py-14 grid gap-10 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="font-serif text-2xl font-medium text-(--text)">
@@ -50,7 +50,7 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="border-t border-(--color-line)">
+      <div>
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-(--text-muted)">
           <div>© {new Date().getFullYear()} Iron Oaks</div>
           <div>
@@ -67,6 +67,14 @@ export function SiteFooter() {
           </div>
         </div>
       </div>
+
+      {/* Mobile-only spacer: reserves room for the fixed bottom nav so the
+          footer's veil extends behind it — no bright background strip below. */}
+      <div
+        aria-hidden="true"
+        className="md:hidden"
+        style={{ height: "calc(64px + env(safe-area-inset-bottom))" }}
+      />
     </footer>
   );
 }

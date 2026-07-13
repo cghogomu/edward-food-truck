@@ -43,7 +43,7 @@ export default function OrderPage() {
   return (
     <div className="max-w-3xl mx-auto px-5 sm:px-8 py-10 sm:py-14">
       <header className="mb-8">
-        <p className="text-(--amber) text-xs uppercase tracking-[0.18em] font-semibold mb-3">
+        <p className="text-gold-chrome text-xs uppercase tracking-[0.18em] font-semibold mb-3">
           Your order
         </p>
         <h1 className="font-serif text-4xl sm:text-5xl leading-tight">

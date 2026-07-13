@@ -23,8 +23,7 @@ export const MENU: MenuItem[] = [
     description:
       "Hot baked potato with a quarter pound of fire-grilled chicken — smoked bacon, butter, cheese, homemade ranch, jalapeños, green onions, and sriracha.",
     price: 15,
-    image:
-      "https://images.unsplash.com/photo-1761712826074-5f1bab2b2f32?w=900&q=80&auto=format&fit=crop",
+    image: "/menu/chicken-bacon-ranch.jpeg",
     tags: ["Signature"],
     modifiers: [
       { id: "extra-bacon", name: "Extra bacon", price: 2 },

@@ -77,7 +77,7 @@ function SuccessShell({ order }: { order: LastOrder | null }) {
       <div className="inline-flex w-16 h-16 rounded-full bg-(--open)/15 border border-(--open)/30 items-center justify-center mb-7">
         <span className="text-(--open) text-3xl">✓</span>
       </div>
-      <p className="text-(--amber) text-xs uppercase tracking-[0.18em] font-semibold mb-3">
+      <p className="text-gold-chrome text-xs uppercase tracking-[0.18em] font-semibold mb-3">
         Order received
       </p>
       <h1 className="font-serif text-4xl sm:text-5xl leading-tight mb-5">

@@ -6,7 +6,7 @@ export default function CommunityPage() {
   return (
     <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12 sm:py-20">
       <header className="mb-14 sm:mb-20 text-center">
-        <p className="text-(--amber) text-xs uppercase tracking-[0.18em] font-semibold mb-4">
+        <p className="text-gold-chrome text-xs uppercase tracking-[0.18em] font-semibold mb-4">
           We are all we got
         </p>
         <h1 className="font-serif text-4xl sm:text-6xl leading-[1.05] mb-6">

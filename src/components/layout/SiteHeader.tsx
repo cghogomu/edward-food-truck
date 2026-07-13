@@ -12,7 +12,7 @@ export function SiteHeader({ state }: { state: SiteState }) {
       <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
         <Link
           href="/"
-          className="font-serif text-xl font-medium tracking-tight text-(--text) hover:text-(--amber) transition-colors"
+          className="font-serif text-xl font-medium tracking-tight text-gold-chrome transition-[filter] hover:brightness-110"
         >
           Iron Oaks
         </Link>

@@ -18,7 +18,7 @@ export function PhotoStrip() {
   const tiles = [...STRIP_PHOTOS, ...STRIP_PHOTOS];
   return (
     <section
-      className="photo-strip border-y border-(--color-line) py-3.5"
+      className="photo-strip py-3.5"
       aria-label="Photos from Iron Oaks"
     >
       <div className="strip-track">

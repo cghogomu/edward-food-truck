@@ -13,35 +13,36 @@ export default async function Home() {
 
   return (
     <>
-      {/* HERO */}
-      <section className="relative">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="https://images.unsplash.com/photo-1761712826074-5f1bab2b2f32?w=1800&q=80&auto=format&fit=crop"
-            alt="Loaded baked potato"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover opacity-50"
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(19,17,15,0.6) 0%, rgba(19,17,15,0.85) 60%, rgba(19,17,15,1) 100%)",
-            }}
-          />
-        </div>
+      {/* FIXED HERO BACKDROP — holds steady while the page scrolls up over it */}
+      <div className="fixed inset-0 -z-10">
+        <Image
+          src="/hero-truck.jpg"
+          alt="Iron Oaks BBQ food truck at night"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover scale-95 opacity-100 brightness-[1.75]"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(120% 100% at 10% 20%, rgba(5,7,6,0.97) 0%, rgba(5,7,6,0.84) 32%, rgba(5,7,6,0.36) 58%, rgba(5,7,6,0) 78%), linear-gradient(90deg, rgba(5,7,6,0.6) 0%, rgba(5,7,6,0.28) 32%, rgba(5,7,6,0.04) 55%, rgba(5,7,6,0) 68%), linear-gradient(270deg, rgba(5,7,6,0.4) 0%, rgba(5,7,6,0.18) 22%, rgba(5,7,6,0.04) 40%, rgba(5,7,6,0) 55%), linear-gradient(180deg, rgba(5,7,6,0.1) 0%, rgba(5,7,6,0.2) 70%, rgba(5,7,6,0.7) 88%, rgba(5,7,6,1) 100%)",
+          }}
+        />
+      </div>
 
+      {/* HERO — transparent, tall enough to reveal the fixed backdrop */}
+      <section className="relative min-h-[90svh]">
         <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 pt-10 sm:pt-16 pb-12 sm:pb-16">
           <div className="max-w-2xl">
-            <p className="text-(--amber) text-xs uppercase tracking-[0.18em] font-semibold mb-5">
+            <p className="text-gold-chrome text-xs uppercase tracking-[0.18em] font-semibold mb-5">
               {SETTINGS.brand.tagline}
             </p>
             <h1 className="font-serif text-5xl sm:text-7xl leading-[1.02] tracking-tight text-(--text)">
               Upscale quality,
               <br />
-              <em className="text-(--amber) not-italic font-medium">
+              <em className="text-gold-chrome not-italic font-medium">
                 for blue collar pockets.
               </em>
             </h1>
@@ -71,14 +72,23 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* PHOTO STRIP */}
-      <PhotoStrip />
+      {/* CONTENT — one continuous veil that fades in at the marquee and holds
+          steady to the bottom, so the truck dims once with no repeated breaks */}
+      <div
+        className="relative z-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(5,7,6,0) 0, rgba(5,7,6,0.65) 90px, rgba(5,7,6,0.65) 100%)",
+        }}
+      >
+        {/* PHOTO STRIP */}
+        <PhotoStrip />
 
       {/* SIGNATURES */}
       <section className="max-w-6xl mx-auto px-5 sm:px-8 py-10 sm:py-14">
         <div className="flex items-end justify-between mb-10 sm:mb-12 gap-4">
           <div>
-            <p className="text-(--amber) text-xs uppercase tracking-[0.18em] font-semibold mb-3">
+            <p className="text-gold-chrome text-xs uppercase tracking-[0.18em] font-semibold mb-3">
               The menu
             </p>
             <h2 className="font-serif text-3xl sm:text-5xl leading-tight">
@@ -131,7 +141,7 @@ export default async function Home() {
 
       {/* STORY TEASE */}
       <section className="max-w-3xl mx-auto px-5 sm:px-8 py-12 sm:py-16 text-center">
-        <p className="text-(--amber) text-xs uppercase tracking-[0.18em] font-semibold mb-4">
+        <p className="text-gold-chrome text-xs uppercase tracking-[0.18em] font-semibold mb-4">
           The shop
         </p>
         <h2 className="font-serif text-3xl sm:text-4xl leading-tight mb-5">
@@ -150,6 +160,7 @@ export default async function Home() {
           Read the story →
         </Link>
       </section>
+      </div>
     </>
   );
 }

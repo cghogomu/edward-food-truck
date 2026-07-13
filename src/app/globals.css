@@ -1,25 +1,26 @@
 @import "tailwindcss";
 
-/* Iron Oaks palette — warm-tinted dark, iron + oak references */
+/* Iron Oaks palette — the truck: deep green body, gold rims/lettering,
+   neon underglow, wet-asphalt night street */
 :root {
-  --bg: #13110F;
-  --bg-raised: #1C1A17;
-  --bg-card: #252220;
-  --bg-card-hover: #2D2A27;
+  --bg: #050706;
+  --bg-raised: #0B0F0D;
+  --bg-card: #111714;
+  --bg-card-hover: #18211C;
   --border: rgba(242, 237, 229, 0.08);
-  --border-strong: rgba(242, 237, 229, 0.15);
+  --border-strong: rgba(233, 196, 94, 0.22);
 
   --text: #F2EDE5;
-  --text-soft: #B8B0A3;
-  --text-muted: #7D766B;
+  --text-soft: #B3B5A9;
+  --text-muted: #79806F;
 
-  --amber: #D89A3A;
-  --amber-deep: #B07A24;
-  --russet: #C56A2F;
-  --russet-deep: #A8551F;
+  --amber: #E9C45E;
+  --amber-deep: #B98F38;
+  --russet: #1E7A42;
+  --russet-deep: #134E2B;
 
-  --open: #8FA67A;
-  --open-deep: #6E8757;
+  --open: #27E27C;
+  --open-deep: #18B863;
   --closed: #C44747;
   --closed-deep: #9E3434;
 }
@@ -68,6 +69,17 @@ button, a {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Polished chrome-gold gradient — bright highlight fading to deep base,
+   the way light rolls off the truck's gold wheel spokes. Use on large
+   gold elements (hero accents, wordmark); too fine for small caps. */
+.text-gold-chrome {
+  background: linear-gradient(177deg, #FBEBBE 0%, #ECC868 34%, #C99A3E 64%, #936E2C 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
 *:focus-visible {
   outline: 2px solid var(--amber);
   outline-offset: 2px;
@@ -88,10 +100,6 @@ button, a {
 ::-webkit-scrollbar-thumb:hover { background: var(--bg-card-hover); }
 
 html { -webkit-text-size-adjust: 100%; }
-
-@media (max-width: 768px) {
-  body { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
-}
 
 /* -------- PHOTO STRIP (auto-scrolling marquee) -------- */
 .photo-strip { overflow: hidden; }

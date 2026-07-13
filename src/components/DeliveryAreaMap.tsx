@@ -17,7 +17,7 @@ export function DeliveryAreaMap() {
   return (
     <figure className="bg-(--bg-card) border border-(--color-line) rounded-2xl p-6 sm:p-8">
       <figcaption className="mb-5">
-        <p className="text-(--amber) text-xs uppercase tracking-[0.18em] font-semibold mb-2">
+        <p className="text-gold-chrome text-xs uppercase tracking-[0.18em] font-semibold mb-2">
           Free delivery zone
         </p>
         <p className="text-(--text-soft) text-sm leading-relaxed">

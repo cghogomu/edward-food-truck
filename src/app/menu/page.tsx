@@ -17,7 +17,7 @@ export default async function MenuPage() {
     <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12 sm:py-20">
       <header className="mb-10 sm:mb-14 flex flex-wrap items-end justify-between gap-5">
         <div>
-          <p className="text-(--amber) text-xs uppercase tracking-[0.18em] font-semibold mb-3">
+          <p className="text-gold-chrome text-xs uppercase tracking-[0.18em] font-semibold mb-3">
             The menu
           </p>
           <h1 className="font-serif text-4xl sm:text-6xl leading-[1.05]">
@@ -47,7 +47,7 @@ export default async function MenuPage() {
                 alt={item.name}
                 fill
                 sizes="(max-width: 640px) 100vw, 40vw"
-                className="object-cover"
+                className={`object-cover ${item.id === "brisket" ? "scale-[0.92] rounded-xl" : ""}`}
               />
             </div>
             <div className="sm:col-span-3">
