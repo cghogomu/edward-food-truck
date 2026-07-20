@@ -107,7 +107,8 @@ html { -webkit-text-size-adjust: 100%; }
   display: flex;
   gap: 14px;
   width: max-content;
-  animation: strip-scroll 60s linear infinite;
+  /* ~6s per photo — scale this with the number of STRIP_PHOTOS to keep the pace steady. */
+  animation: strip-scroll 175s linear infinite;
 }
 @keyframes strip-scroll {
   0% { transform: translateX(0); }

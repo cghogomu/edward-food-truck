@@ -24,7 +24,7 @@ export default function AboutPage() {
         <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-(--bg-card) border border-(--color-line)">
           <Image
             src={TEAM_BIO.image}
-            alt="Edward and Keilone of Iron Oaks BBQ"
+            alt="Edward, founder and pitmaster of Iron Oaks BBQ"
             fill
             sizes="(max-width: 640px) 100vw, 640px"
             className="object-cover"

@@ -6,11 +6,10 @@ export type TeamBio = {
 };
 
 export const TEAM_BIO: TeamBio = {
-  image:
-    "https://images.unsplash.com/photo-1583394293214-28a4b0028a5b?w=900&q=80&auto=format&fit=crop",
-  placeholder: true,
+  // Edward's profile headshot. Swap in a photo of Edward & Keilone together when available.
+  image: "/edward-about.jpeg",
   paragraphs: [
-    "I'm Edward, the founder and smoker of Iron Oaks BBQ — and this is Keilone, the backbone of operations.",
+    "I'm Edward — founder and pitmaster of Iron Oaks BBQ. Alongside Keilone, who keeps our operations running, we run the truck as a two-person Texas team.",
     "We're two Texans representing our community, culture, and history by contributing to Texas' reputation as the BBQ Capital of the World.",
   ],
 };
