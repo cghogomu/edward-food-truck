@@ -28,6 +28,15 @@ Repo: https://github.com/cghogomu/edward-food-truck (`master` → auto-deploys t
 - [x] Verify end-to-end: dashboard toggle → saved to Redis → shown on public site
 - [x] Fix open/closed status to use Austin time (`America/Chicago`) instead of the
       UTC server clock, so hours are correct in production
+- [x] **Home-page marquee** — expanded to 29 photos + per-image crop-focus so tall
+      portraits don't get heads sliced by the 4:3 tiles (`src/components/PhotoStrip.tsx`) *(2026-07-21)*
+- [x] **About page** — replaced the dead Unsplash photo with Edward's self-hosted
+      headshot (`public/edward-about.jpeg`); reworded bio to name Edward as founder
+      while crediting Keilone; dropped the "Photo coming" badge *(2026-07-21)*
+- [x] **Dev crash-loop fix** — a stray `C:\…`-named folder + a stale `.next` cache
+      caused a Turbopack panic/reload loop (whole-page flicker); removed both *(2026-07-21)*
+- [x] **Meridian portfolio** — refreshed the Iron Oaks tile (new home-page
+      screenshot) and fixed its link across the Meridian Works site *(2026-07-21)*
 
 ## To do
 
@@ -40,6 +49,9 @@ Repo: https://github.com/cghogomu/edward-food-truck (`master` → auto-deploys t
 - [ ] **Custom domain** — swap in Edward's real domain once available
       (Vercel → Settings → Domains). The `*.vercel.app` URL is the portfolio
       stand-in until then.
+- [ ] **Localize remaining stock photos** — menu items "cookies" and "can drink"
+      still use working Unsplash stock URLs (`src/content/menu.ts`); swap for real
+      or local photos when available.
 
 ## Notes
 
