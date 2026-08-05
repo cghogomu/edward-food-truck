@@ -71,6 +71,9 @@ export default function DashboardPage() {
       {/* Inventory — the headline action */}
       <InventoryControls state={state} onPatch={patch} />
 
+      {/* Service hours */}
+      <HoursControls state={state} onPatch={patch} />
+
       {/* Promo banner */}
       <SimpleToggle
         title="Free delivery banner"
@@ -257,6 +260,146 @@ function InventoryControls({
           </button>
         </div>
       </details>
+    </section>
+  );
+}
+
+// Day keys must match the `weekday: "short"` values `truckNow()` produces in
+// en-US, since deriveOpenStatus compares them directly against hours.days.
+const DAY_KEYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function HoursControls({
+  state,
+  onPatch,
+}: {
+  state: SiteState;
+  onPatch: (p: Partial<SiteState>) => Promise<void>;
+}) {
+  const [open, setOpen] = useState(state.hours.open);
+  const [close, setClose] = useState(state.hours.close);
+  const [days, setDays] = useState<string[]>(state.hours.days);
+  const [busy, setBusy] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  // No effect syncing drafts back from `state` — this section is the only thing
+  // that edits hours, so after a save the drafts already match what was stored.
+
+  const toMinutes = (t: string) => {
+    const [h, m] = t.split(":").map(Number);
+    return h * 60 + m;
+  };
+
+  // The open/closed check compares plain minute values, so a closing time that
+  // wraps past midnight would read as "closed all day". Block it rather than
+  // let Edward save hours that silently hide the truck.
+  const wrapsMidnight = toMinutes(close) <= toMinutes(open);
+  const noDays = days.length === 0;
+  const invalid = wrapsMidnight || noDays;
+
+  const dirty =
+    open !== state.hours.open ||
+    close !== state.hours.close ||
+    days.join() !== state.hours.days.join();
+
+  function toggleDay(day: string) {
+    setSaved(false);
+    setDays((d) =>
+      d.includes(day)
+        ? d.filter((x) => x !== day)
+        : DAY_KEYS.filter((k) => k === day || d.includes(k))
+    );
+  }
+
+  async function save() {
+    if (invalid) return;
+    setBusy(true);
+    await onPatch({ hours: { open, close, days } });
+    setBusy(false);
+    setSaved(true);
+  }
+
+  return (
+    <section className="bg-(--bg-card) border border-(--color-line) rounded-2xl p-6 mb-5">
+      <div className="text-xs uppercase tracking-[0.18em] font-semibold text-(--amber) mb-1">
+        Service hours
+      </div>
+      <p className="text-(--text-soft) text-sm mb-5">
+        When the truck shows as open. Times are Austin time.
+      </p>
+
+      <div className="grid grid-cols-2 gap-3 mb-5">
+        <label className="block">
+          <span className="text-xs text-(--text-muted) uppercase tracking-wider">
+            Opens
+          </span>
+          <input
+            type="time"
+            value={open}
+            onChange={(e) => {
+              setOpen(e.target.value);
+              setSaved(false);
+            }}
+            className="w-full mt-1 bg-(--bg) border border-(--color-line) rounded-lg px-3 py-2 text-(--text) focus:border-(--amber) outline-hidden"
+          />
+        </label>
+        <label className="block">
+          <span className="text-xs text-(--text-muted) uppercase tracking-wider">
+            Closes
+          </span>
+          <input
+            type="time"
+            value={close}
+            onChange={(e) => {
+              setClose(e.target.value);
+              setSaved(false);
+            }}
+            className="w-full mt-1 bg-(--bg) border border-(--color-line) rounded-lg px-3 py-2 text-(--text) focus:border-(--amber) outline-hidden"
+          />
+        </label>
+      </div>
+
+      <div className="text-xs text-(--text-muted) uppercase tracking-wider mb-2">
+        Days open
+      </div>
+      <div className="flex flex-wrap gap-2 mb-5">
+        {DAY_KEYS.map((day) => {
+          const on = days.includes(day);
+          return (
+            <button
+              key={day}
+              onClick={() => toggleDay(day)}
+              aria-pressed={on}
+              className={`px-3.5 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                on
+                  ? "bg-(--amber)/15 text-(--amber) border-(--amber)/40"
+                  : "bg-(--bg) text-(--text-muted) border-(--color-line) hover:text-(--text)"
+              }`}
+            >
+              {day}
+            </button>
+          );
+        })}
+      </div>
+
+      {wrapsMidnight && (
+        <p className="text-(--closed) text-sm mb-3">
+          Closing time must be later than opening time. Hours that run past
+          midnight aren&apos;t supported yet.
+        </p>
+      )}
+      {noDays && !wrapsMidnight && (
+        <p className="text-(--closed) text-sm mb-3">
+          Pick at least one day, or the truck reads as closed every day.
+        </p>
+      )}
+
+      <button
+        onClick={save}
+        disabled={busy || invalid || !dirty}
+        className="w-full bg-(--russet) hover:bg-(--russet-deep) text-(--text) py-3 rounded-lg text-sm font-semibold uppercase tracking-wide transition-colors disabled:opacity-50"
+      >
+        {busy ? "Saving…" : saved && !dirty ? "Saved" : "Save hours"}
+      </button>
     </section>
   );
 }
