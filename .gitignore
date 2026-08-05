@@ -44,3 +44,10 @@ next-env.d.ts
 # Meridian Works deliverables — business docs, not part of the site
 Iron-Oaks-Care-Plan.html
 Iron-Oaks-Care-Plan.md
+
+# Photo drop folders from Edward — the images that made the cut are already
+# committed under public/ (marquee, menu, about). These are the raw originals.
+/Images */
+
+# Local render from scripts/render-map-preview.mjs
+.map-preview.png

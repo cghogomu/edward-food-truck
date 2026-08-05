@@ -55,8 +55,7 @@ export const MENU: MenuItem[] = [
     name: "Cookies",
     description: "Soft-baked and made fresh. The right way to finish.",
     price: 2,
-    image:
-      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=900&q=80&auto=format&fit=crop",
+    image: "/menu/cookies.jpg",
     category: "extra",
   },
   {
@@ -64,8 +63,7 @@ export const MENU: MenuItem[] = [
     name: "Can Drink",
     description: "An ice-cold can to wash it all down.",
     price: 2,
-    image:
-      "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=900&q=80&auto=format&fit=crop",
+    image: "/menu/can-drink.jpg",
     category: "extra",
   },
 ];
