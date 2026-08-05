@@ -5,7 +5,6 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { PromoBanner } from "@/components/layout/PromoBanner";
-import { CartIndicator } from "@/components/CartIndicator";
 import { getSiteState } from "@/lib/state";
 
 const inter = Inter({
@@ -46,7 +45,6 @@ export default async function RootLayout({
         <SiteHeader state={state} />
         <main className="flex-1">{children}</main>
         <SiteFooter />
-        <CartIndicator />
         <MobileBottomNav />
       </body>
     </html>

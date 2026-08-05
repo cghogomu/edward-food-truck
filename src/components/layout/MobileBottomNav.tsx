@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { useCart } from "@/lib/cart";
+import { OrderLink } from "@/components/OrderLink";
 
 type Item = {
   href: string;
   label: string;
+  /** Opens Heartland in a new tab instead of navigating within the site. */
+  external?: boolean;
   icon: ReactNode;
 };
 
@@ -40,6 +42,7 @@ const ITEMS: Item[] = [
   {
     href: "/order",
     label: "Order",
+    external: true,
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M6 7h12l-1.2 12.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7z" />
@@ -66,7 +69,6 @@ function isActive(pathname: string, href: string): boolean {
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const { itemCount, hydrated } = useCart();
   return (
     <nav
       className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-(--bg)/95 backdrop-blur-md"
@@ -75,37 +77,42 @@ export function MobileBottomNav() {
     >
       <ul className="flex items-stretch justify-around h-16">
         {ITEMS.map((item) => {
-          const active = isActive(pathname, item.href);
-          const showBadge = hydrated && item.href === "/order" && itemCount > 0;
+          // The Order tab leaves the site, so it never reads as the current page.
+          const active = !item.external && isActive(pathname, item.href);
+          const tabClass = `h-full flex flex-col items-center justify-center gap-1 transition-colors ${
+            active
+              ? "text-(--amber)"
+              : "text-(--text-soft) hover:text-(--text) active:bg-(--bg-card)"
+          }`;
+          const body = (
+            <>
+              {active && (
+                <span
+                  aria-hidden="true"
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-(--amber) rounded-b-full"
+                />
+              )}
+              <span className="relative block">{item.icon}</span>
+              <span className="text-[10px] tracking-[0.12em] uppercase font-medium">
+                {item.label}
+              </span>
+            </>
+          );
           return (
             <li key={item.href} className="flex-1 relative">
-              <Link
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={`h-full flex flex-col items-center justify-center gap-1 transition-colors ${
-                  active
-                    ? "text-(--amber)"
-                    : "text-(--text-soft) hover:text-(--text) active:bg-(--bg-card)"
-                }`}
-              >
-                {active && (
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-(--amber) rounded-b-full"
-                  />
-                )}
-                <span className="relative block">
-                  {item.icon}
-                  {showBadge && (
-                    <span className="absolute -top-1.5 -right-2 inline-flex items-center justify-center min-w-4 h-4 px-1 rounded-full bg-(--amber) text-(--bg) text-[10px] font-bold leading-none">
-                      {itemCount}
-                    </span>
-                  )}
-                </span>
-                <span className="text-[10px] tracking-[0.12em] uppercase font-medium">
-                  {item.label}
-                </span>
-              </Link>
+              {item.external ? (
+                <OrderLink className={tabClass} ariaLabel="Order on Heartland (opens in a new tab)">
+                  {body}
+                </OrderLink>
+              ) : (
+                <Link
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  className={tabClass}
+                >
+                  {body}
+                </Link>
+              )}
             </li>
           );
         })}

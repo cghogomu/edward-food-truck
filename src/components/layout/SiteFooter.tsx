@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SETTINGS } from "@/content/settings";
+import { OrderLink } from "@/components/OrderLink";
 
 export function SiteFooter() {
   return (
@@ -23,7 +24,12 @@ export function SiteFooter() {
           </div>
           <ul className="space-y-2 text-sm">
             <li><Link href="/menu" className="text-(--text-soft) hover:text-(--text)">Menu</Link></li>
-            <li><Link href="/order" className="text-(--text-soft) hover:text-(--text)">Order</Link></li>
+            <li><Link href="/order" className="text-(--text-soft) hover:text-(--text)">How to order</Link></li>
+            <li>
+              <OrderLink className="text-(--amber) hover:text-(--text)">
+                Order on Heartland ↗
+              </OrderLink>
+            </li>
             <li><Link href="/calendar" className="text-(--text-soft) hover:text-(--text)">Calendar</Link></li>
             <li><Link href="/catering" className="text-(--text-soft) hover:text-(--text)">Catering</Link></li>
             <li><Link href="/community" className="text-(--text-soft) hover:text-(--text)">Community</Link></li>

@@ -8,8 +8,13 @@ export const SETTINGS = {
     venue: "Construction Specialties",
     street: "406 W. Braker Ln.",
     cityState: "Austin, TX 78753",
-    mapsUrl:
-      "https://www.google.com/maps/search/?api=1&query=406%20W%20Braker%20Ln%20Austin%20TX%2078753",
+    // No Google Maps / directions link while the truck stop isn't finalised —
+    // the address is shown, but the site doesn't route anyone there yet. To
+    // restore, add:
+    //   directionsUrl: `https://www.google.com/maps/dir/?api=1&destination=${
+    //     encodeURIComponent("406 W Braker Ln, Austin, TX 78753")}`
+    // and link it from the four "Get directions" spots (home, order, calendar,
+    // community) plus the delivery-zone map.
   },
   contact: {
     phone: "(512) 555-0123",
@@ -23,9 +28,12 @@ export const SETTINGS = {
     salesTaxRate: 0.0825,
     stripeFeePassThrough: 0.3,
     cateringSmallThreshold: 60,
-    // Paste Edward's Heartland online payment-page link here once Heartland
-    // enables it on his account. Until then it points to a placeholder.
-    paymentUrl: "https://example.com/replace-with-eds-payment-link",
+    // Edward's Heartland "Online Ordering" storefront — the real ordering system:
+    // menu, cart, checkout and payment all live there. This site links out to it
+    // rather than rebuilding a cart, because Heartland has no documented way to
+    // accept an order handed over from an outside site. Always render it through
+    // <OrderLink> so every entry point behaves the same.
+    orderUrl: "https://ironoaksbbq.hrpos.heartland.us/",
   },
   credits: {
     builder: "Meridian Works",

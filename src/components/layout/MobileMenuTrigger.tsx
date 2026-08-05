@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { OrderLink } from "@/components/OrderLink";
 
 const LINKS = [
   { href: "/", label: "Home" },
   { href: "/menu", label: "Menu" },
-  { href: "/order", label: "Order" },
+  { href: "/order", label: "How to order" },
   { href: "/calendar", label: "Calendar" },
   { href: "/catering", label: "Catering" },
   { href: "/about", label: "About" },
@@ -112,13 +113,12 @@ export function MobileMenuTrigger() {
         </ul>
 
         <div className="mt-10 px-2">
-          <Link
-            href="/order"
-            onClick={() => setOpen(false)}
-            className="block w-full text-center bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-5 py-4 rounded-lg text-sm font-semibold uppercase tracking-wide"
-          >
+          <OrderLink className="block w-full text-center bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-5 py-4 rounded-lg text-sm font-semibold uppercase tracking-wide">
             Order now
-          </Link>
+          </OrderLink>
+          <p className="mt-2.5 text-center text-[11px] text-(--text-muted)">
+            Opens Heartland in a new tab
+          </p>
         </div>
       </nav>
     </div>

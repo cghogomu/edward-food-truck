@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { OpenStatus } from "@/types";
+import { OrderLink } from "@/components/OrderLink";
 
 const STATE_TINT: Record<OpenStatus["state"], string> = {
   open: "border-(--open)/40 bg-(--open)/8",
@@ -54,12 +54,9 @@ export function OpenStatusHero({ status }: { status: OpenStatus }) {
         </div>
 
         {showOrder && (
-          <Link
-            href="/order"
-            className="bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-5 py-3 rounded-lg text-sm font-semibold tracking-wide uppercase transition-colors"
-          >
+          <OrderLink className="bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-5 py-3 rounded-lg text-sm font-semibold tracking-wide uppercase transition-colors">
             Order now
-          </Link>
+          </OrderLink>
         )}
       </div>
 
