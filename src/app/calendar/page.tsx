@@ -78,14 +78,6 @@ export default async function CalendarPage() {
           <span className="text-(--text)">
             {SETTINGS.location.venue} · {SETTINGS.location.street}, {SETTINGS.location.cityState}
           </span>
-          <a
-            href={SETTINGS.location.mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-(--amber) hover:text-(--text) font-medium transition-colors"
-          >
-            Get directions →
-          </a>
         </div>
       </header>
 

@@ -38,14 +38,6 @@ export default function CommunityPage() {
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2">
               <a
-                href={SETTINGS.location.mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-(--amber) hover:text-(--text) text-sm font-medium transition-colors"
-              >
-                Get directions →
-              </a>
-              <a
                 href={HOST_BUSINESS.url}
                 target="_blank"
                 rel="noopener noreferrer"

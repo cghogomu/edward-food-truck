@@ -59,15 +59,7 @@ export default async function Home() {
           <div className="mt-6 max-w-2xl text-(--text-soft)">
             <span className="text-(--text) font-medium">Come visit us</span> —{" "}
             {SETTINGS.location.venue}, {SETTINGS.location.street},{" "}
-            {SETTINGS.location.cityState}.{" "}
-            <a
-              href={SETTINGS.location.mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-(--amber) hover:text-(--text) font-medium transition-colors whitespace-nowrap"
-            >
-              Get directions →
-            </a>
+            {SETTINGS.location.cityState}.
           </div>
         </div>
       </section>
