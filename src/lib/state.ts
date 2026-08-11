@@ -2,7 +2,13 @@ import "server-only";
 import { promises as fs } from "fs";
 import path from "path";
 import { Redis } from "@upstash/redis";
-import type { SiteState, OpenStatus, CalendarEntry } from "@/types";
+import type {
+  SiteState,
+  LegacySiteState,
+  ServicePeriod,
+  OpenStatus,
+  CalendarEntry,
+} from "@/types";
 
 const STATE_FILE = path.join(process.cwd(), "data", "site-state.json");
 const STATE_KEY = "edward-food-truck:site-state";
@@ -17,16 +23,67 @@ const hasRedis =
   process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
 const redis = hasRedis ? Redis.fromEnv() : null;
 
+/**
+ * State stored before service periods existed has a single `hours`/`inventory`
+ * pair. That shape is live in production Redis, so every read is normalised
+ * rather than trusted.
+ *
+ * The old hours become the FIRST period untouched, so migrating can't silently
+ * change when the truck appears to be open. The second period is added with
+ * sensible times but no days selected — inactive until Edward turns it on,
+ * because inventing an evening service he isn't running would be worse than
+ * making him tick five boxes.
+ */
+function migrate(raw: SiteState | LegacySiteState): SiteState {
+  if (Array.isArray((raw as SiteState).services)) return raw as SiteState;
+
+  const legacy = raw as LegacySiteState;
+  const max = legacy.inventory?.max ?? 20;
+  const services: ServicePeriod[] = [
+    {
+      id: "lunch",
+      label: "Lunch",
+      open: legacy.hours?.open ?? "11:00",
+      close: legacy.hours?.close ?? "14:00",
+      days: legacy.hours?.days ?? [],
+      inventory: legacy.inventory ?? { today: max, max },
+      soldOut: legacy.soldOut ?? false,
+    },
+    {
+      id: "evening",
+      label: "Evening",
+      open: "17:00",
+      close: "20:00",
+      days: [],
+      inventory: { today: max, max },
+      soldOut: false,
+    },
+  ];
+
+  return {
+    services,
+    freeDeliveryBanner: legacy.freeDeliveryBanner ?? true,
+    today: legacy.today ?? todayKey(),
+    calendar: legacy.calendar ?? [],
+  };
+}
+
 async function readSeed(): Promise<SiteState> {
   const raw = await fs.readFile(STATE_FILE, "utf-8");
-  return JSON.parse(raw) as SiteState;
+  return migrate(JSON.parse(raw) as SiteState | LegacySiteState);
 }
 
 export async function getSiteState(): Promise<SiteState> {
   if (!redis) return readSeed();
 
-  const stored = await redis.get<SiteState>(STATE_KEY);
-  if (stored) return stored;
+  const stored = await redis.get<SiteState | LegacySiteState>(STATE_KEY);
+  if (stored) {
+    const migrated = migrate(stored);
+    // Write the upgraded shape back once, so this doesn't run on every request
+    // and so a later partial patch can't reintroduce the old fields.
+    if (migrated !== stored) await redis.set(STATE_KEY, migrated);
+    return migrated;
+  }
 
   // First request against a fresh Redis: seed it from the bundled JSON so the
   // deployed site starts with the same data it ships with.
@@ -83,12 +140,67 @@ function todayKey(): string {
   return truckNow().dateKey;
 }
 
-function isWithinHours(open: string, close: string): boolean {
-  const [oh, om] = open.split(":").map(Number);
-  const [ch, cm] = close.split(":").map(Number);
-  const minutes = truckNow().minutes;
-  return minutes >= oh * 60 + om && minutes < ch * 60 + cm;
+function toMinutes(t: string): number {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
 }
+
+function isWithinHours(open: string, close: string): boolean {
+  const minutes = truckNow().minutes;
+  return minutes >= toMinutes(open) && minutes < toMinutes(close);
+}
+
+/** Periods running today, earliest first. */
+function periodsToday(state: SiteState, dayOverride: boolean): ServicePeriod[] {
+  const dayName = truckNow().day;
+  return state.services
+    .filter((s) => s.days.length > 0 && (dayOverride || s.days.includes(dayName)))
+    .sort((a, b) => toMinutes(a.open) - toMinutes(b.open));
+}
+
+function formatTime(t: string): string {
+  const [h, m] = t.split(":").map(Number);
+  const suffix = h >= 12 ? "pm" : "am";
+  const hour = h % 12 === 0 ? 12 : h % 12;
+  return m === 0 ? `${hour}${suffix}` : `${hour}:${String(m).padStart(2, "0")}${suffix}`;
+}
+
+/** "Lunch 11am–2pm · Evening 5pm–8pm" */
+function describe(periods: ServicePeriod[]): string {
+  return periods
+    .map((p) => `${p.label} ${formatTime(p.open)}–${formatTime(p.close)}`)
+    .join(" · ");
+}
+
+function isSoldOut(p: ServicePeriod): boolean {
+  return p.soldOut || p.inventory.today <= 0;
+}
+
+/**
+ * Whether the truck can take an order right now. Every "Order on Heartland"
+ * CTA is gated on this — sending someone to checkout while the truck is closed,
+ * sold out, or off catering just produces an order nobody can fill.
+ */
+export function isOrderable(status: OpenStatus): boolean {
+  return status.state === "open" || status.state === "low";
+}
+
+/** Every day any service runs — for "is the truck out at all today?" checks. */
+export function servingDays(state: SiteState): string[] {
+  const all = new Set(state.services.flatMap((s) => s.days));
+  return DAY_ORDER.filter((d) => all.has(d));
+}
+
+/** "Lunch 11am–2pm · Evening 5pm–8pm", skipping any period that isn't running. */
+export function describeServices(state: SiteState): string {
+  return describe(
+    [...state.services]
+      .filter((s) => s.days.length > 0)
+      .sort((a, b) => toMinutes(a.open) - toMinutes(b.open))
+  );
+}
+
+const DAY_ORDER = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function findToday(calendar: CalendarEntry[]): CalendarEntry | undefined {
   return calendar.find((e) => e.date === todayKey());
@@ -121,18 +233,71 @@ export function deriveOpenStatus(state: SiteState): OpenStatus {
     };
   }
 
-  const dayName = truckNow().day;
-  const isOperatingDay = state.hours.days.includes(dayName);
+  const today = periodsToday(state, todayEntry?.kind === "open");
 
-  if (!isOperatingDay && todayEntry?.kind !== "open") {
+  if (today.length === 0) {
+    const anyDays = state.services.filter((s) => s.days.length > 0);
     return {
       state: "closed",
       label: "Closed today",
-      detail: `Open ${state.hours.days.join(", ")} · ${state.hours.open}–${state.hours.close}`,
+      detail: anyDays.length
+        ? `Next: ${describe(anyDays)}`
+        : "Back at our next regular service.",
     };
   }
 
-  if (state.soldOut || state.inventory.today <= 0) {
+  // A window that's running right now wins. Each carries its own portions, so
+  // selling out at lunch leaves the evening untouched.
+  const active = today.find((p) => isWithinHours(p.open, p.close));
+
+  if (active) {
+    if (isSoldOut(active)) {
+      const later = today.find(
+        (p) => toMinutes(p.open) > truckNow().minutes && !isSoldOut(p)
+      );
+      return later
+        ? {
+            state: "sold-out",
+            label: `${active.label} is sold out`,
+            detail: `${later.label} service starts at ${formatTime(later.open)}.`,
+            periodLabel: active.label,
+          }
+        : {
+            state: "sold-out",
+            label: "Sold out for today",
+            detail: "Back tomorrow with a fresh batch.",
+            periodLabel: active.label,
+          };
+    }
+
+    const low =
+      active.inventory.today <= Math.ceil(active.inventory.max * 0.25);
+    return {
+      state: low ? "low" : "open",
+      label: low ? "Almost gone" : "Open now",
+      detail: `${active.label} · ${active.inventory.today} of ${active.inventory.max} portions left`,
+      remaining: active.inventory.today,
+      max: active.inventory.max,
+      periodLabel: active.label,
+    };
+  }
+
+  // Between windows — point at the next one that still has food.
+  const upcoming = today.filter((p) => toMinutes(p.open) > truckNow().minutes);
+  const next = upcoming.find((p) => !isSoldOut(p));
+
+  if (next) {
+    return {
+      state: "closed",
+      label: "Closed right now",
+      detail: `${next.label} starts at ${formatTime(next.open)}`,
+      remaining: next.inventory.today,
+      max: next.inventory.max,
+      periodLabel: next.label,
+    };
+  }
+
+  if (upcoming.length > 0) {
     return {
       state: "sold-out",
       label: "Sold out for today",
@@ -140,23 +305,9 @@ export function deriveOpenStatus(state: SiteState): OpenStatus {
     };
   }
 
-  if (!isWithinHours(state.hours.open, state.hours.close)) {
-    return {
-      state: "closed",
-      label: "Closed right now",
-      detail: `Today's hours · ${state.hours.open}–${state.hours.close}`,
-      remaining: state.inventory.today,
-      max: state.inventory.max,
-    };
-  }
-
-  const low = state.inventory.today <= Math.ceil(state.inventory.max * 0.25);
-
   return {
-    state: low ? "low" : "open",
-    label: low ? "Almost gone" : "Open now",
-    detail: `${state.inventory.today} of ${state.inventory.max} portions left`,
-    remaining: state.inventory.today,
-    max: state.inventory.max,
+    state: "closed",
+    label: "Closed for today",
+    detail: `Today's service · ${describe(today)}`,
   };
 }

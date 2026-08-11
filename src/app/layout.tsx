@@ -4,8 +4,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
-import { PromoBanner } from "@/components/layout/PromoBanner";
-import { getSiteState } from "@/lib/state";
+import { getSiteState, deriveOpenStatus, isOrderable } from "@/lib/state";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -34,6 +33,10 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const state = await getSiteState();
+  // One source of truth for whether any "Order" CTA is live, so the header,
+  // footer and mobile nav can never disagree with the status badge.
+  const status = deriveOpenStatus(state);
+  const orderable = isOrderable(status);
 
   return (
     <html
@@ -41,11 +44,10 @@ export default async function RootLayout({
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <PromoBanner state={state} />
         <SiteHeader state={state} />
         <main className="flex-1">{children}</main>
-        <SiteFooter />
-        <MobileBottomNav />
+        <SiteFooter orderable={orderable} />
+        <MobileBottomNav orderable={orderable} reason={status.detail} />
       </body>
     </html>
   );

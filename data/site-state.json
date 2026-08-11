@@ -1,22 +1,44 @@
 {
-  "inventory": {
-    "today": 10,
-    "max": 20
-  },
-  "soldOut": false,
+  "services": [
+    {
+      "id": "lunch",
+      "label": "Lunch",
+      "open": "11:00",
+      "close": "14:00",
+      "days": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri"
+      ],
+      "inventory": {
+        "today": 20,
+        "max": 20
+      },
+      "soldOut": false
+    },
+    {
+      "id": "evening",
+      "label": "Evening",
+      "open": "15:00",
+      "close": "20:00",
+      "days": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri"
+      ],
+      "inventory": {
+        "today": 20,
+        "max": 20
+      },
+      "soldOut": false
+    }
+  ],
   "freeDeliveryBanner": true,
   "today": "2026-05-17",
-  "hours": {
-    "open": "09:00",
-    "close": "18:00",
-    "days": [
-      "Mon",
-      "Tue",
-      "Wed",
-      "Thu",
-      "Fri"
-    ]
-  },
   "calendar": [
     {
       "date": "2026-05-18",

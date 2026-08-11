@@ -1,5 +1,4 @@
-import { getSiteState } from "@/lib/state";
-import { SETTINGS } from "@/content/settings";
+import { getSiteState, describeServices, servingDays } from "@/lib/state";
 import type { CalendarEntry } from "@/types";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -70,15 +69,10 @@ export default async function CalendarPage() {
           <em className="text-(--amber) not-italic">When we&apos;re booked.</em>
         </h1>
         <p className="mt-5 text-(--text-soft) max-w-xl">
-          Regular service is {state.hours.open}–{state.hours.close}. If we&apos;re
+          Regular service is {describeServices(state)}. If we&apos;re
           catering, you&apos;ll see who for — that way you know to book ahead, and
           you know who&apos;s lucky enough to be feeding their team that day.
         </p>
-        <div className="mt-5 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-sm">
-          <span className="text-(--text)">
-            {SETTINGS.location.venue} · {SETTINGS.location.street}, {SETTINGS.location.cityState}
-          </span>
-        </div>
       </header>
 
       {/* Month label + legend */}
@@ -111,7 +105,7 @@ export default async function CalendarPage() {
           const key = dateKey(d);
           const isPast = key < todayKey;
           const isToday = key === todayKey;
-          const { kind, entry } = deriveDayKind(d, state.calendar, state.hours.days);
+          const { kind, entry } = deriveDayKind(d, state.calendar, servingDays(state));
 
           const kindStyle = isPast
             ? "bg-(--bg-card)/30 border-(--color-line)/30"

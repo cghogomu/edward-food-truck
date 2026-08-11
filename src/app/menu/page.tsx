@@ -1,14 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MENU } from "@/content/menu";
-import { getSiteState, deriveOpenStatus } from "@/lib/state";
+import { MENU, formatPrice } from "@/content/menu";
+import { getSiteState, deriveOpenStatus, isOrderable } from "@/lib/state";
 import { OpenStatusPill } from "@/components/OpenStatusPill";
 import { OrderLink } from "@/components/OrderLink";
 
 export default async function MenuPage() {
   const state = await getSiteState();
   const status = deriveOpenStatus(state);
-  const orderable = status.state === "open" || status.state === "low";
+  const orderable = isOrderable(status);
 
   const cards = MENU.filter((item) => item.category !== "extra");
   const extras = MENU.filter((item) => item.category === "extra");
@@ -42,7 +42,7 @@ export default async function MenuPage() {
                 alt={item.name}
                 fill
                 sizes="(max-width: 640px) 100vw, 40vw"
-                className={`object-cover ${item.id === "brisket" ? "scale-[0.92] rounded-xl" : ""}`}
+                className="object-cover"
               />
             </div>
             <div className="sm:col-span-3">
@@ -51,7 +51,9 @@ export default async function MenuPage() {
                   {item.name}
                 </h2>
                 {!item.comingSoon && (
-                  <span className="font-serif text-2xl text-(--amber)">${item.price}</span>
+                  <span className="font-serif text-2xl text-(--amber)">
+                    {formatPrice(item.price)}
+                  </span>
                 )}
               </div>
               {item.tags && item.tags.length > 0 && (
@@ -66,35 +68,23 @@ export default async function MenuPage() {
                   ))}
                 </div>
               )}
-              <p className="text-(--text-soft) leading-relaxed mb-5">
+              {/* Heartland's own copy. Spanish sits under the English, muted,
+                  rather than run together on one line as Heartland stores it. */}
+              <p className="text-(--text-soft) leading-relaxed mb-3">
                 {item.description}
               </p>
-
-              {/* Ordering happens on Heartland, so the ways this can be customized
-                  have to be readable here — otherwise they're invisible until
-                  checkout. */}
-              {item.modifiers && item.modifiers.length > 0 && (
-                <div className="border-t border-(--color-line) pt-4">
-                  <div className="text-[10px] uppercase tracking-[0.18em] font-semibold text-(--amber) mb-2.5">
-                    Make it yours
-                  </div>
-                  <ul className="flex flex-wrap gap-x-2 gap-y-2">
-                    {item.modifiers.map((mod) => (
-                      <li
-                        key={mod.id}
-                        className="text-sm text-(--text-soft) bg-(--bg-card) border border-(--color-line) rounded-full px-3 py-1"
-                      >
-                        {mod.name}
-                        {mod.price ? (
-                          <span className="text-(--amber) ml-1.5 font-medium">
-                            +${mod.price.toFixed(2)}
-                          </span>
-                        ) : null}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+              {item.descriptionEs && (
+                <p
+                  lang="es"
+                  className="text-(--text-muted) text-sm leading-relaxed mb-5"
+                >
+                  {item.descriptionEs}
+                </p>
               )}
+
+              {/* Customization options deliberately aren't listed here — the
+                  customer picks them on Heartland, which is the authority on
+                  what's actually available and what it costs. */}
 
               {item.comingSoon && (
                 <div className="mt-4 text-(--text-muted) text-sm italic">Coming soon.</div>
@@ -107,21 +97,36 @@ export default async function MenuPage() {
       {extras.length > 0 && (
         <div className="mt-14 sm:mt-16">
           <h2 className="font-serif text-2xl sm:text-3xl text-(--text) mb-5">
-            Sides &amp; Drinks
+            Drinks
           </h2>
-          <div className="bg-(--bg-card) border border-(--color-line) rounded-2xl divide-y divide-(--color-line)">
+          {/* Product shots come from Heartland on white backgrounds, so each
+              sits on its own light tile rather than floating on the dark card. */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
             {extras.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center justify-between gap-4 px-5 py-4 sm:px-6 sm:py-5"
+                className="bg-(--bg-card) border border-(--color-line) rounded-xl p-3 text-center"
               >
-                <div className="min-w-0">
-                  <div className="flex items-baseline gap-3">
-                    <span className="font-serif text-lg text-(--text)">{item.name}</span>
-                    <span className="text-(--amber) font-medium">${item.price}</span>
-                  </div>
-                  <p className="text-(--text-soft) text-sm mt-0.5">{item.description}</p>
+                <div className="relative w-full aspect-square rounded-lg bg-white overflow-hidden mb-3">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    sizes="(max-width: 640px) 45vw, 20vw"
+                    className="object-contain p-2"
+                  />
                 </div>
+                <div className="text-(--text) text-sm font-medium leading-snug">
+                  {item.name}
+                </div>
+                <div className="text-(--amber) text-sm mt-1">
+                  {formatPrice(item.price)}
+                </div>
+                {item.description && (
+                  <p className="text-(--text-soft) text-xs mt-1">
+                    {item.description}
+                  </p>
+                )}
               </div>
             ))}
           </div>
@@ -131,19 +136,24 @@ export default async function MenuPage() {
       {/* Second CTA — the first one is 3+ screens up by the time you've read the menu. */}
       <div className="mt-14 bg-(--bg-card) border border-(--color-line) rounded-2xl p-7 sm:p-9 text-center">
         <h2 className="font-serif text-2xl sm:text-3xl text-(--text) mb-2">
-          Ready to eat?
+          {orderable ? "Ready to eat?" : "We're closed right now."}
         </h2>
         <p className="text-(--text-soft) text-sm mb-6 max-w-md mx-auto">
-          Ordering and payment happen on our Heartland page — pick your potato,
-          customize it, and pay there.
+          {orderable
+            ? "Ordering and payment happen on our Heartland page — pick your potato, customize it, and pay there."
+            : status.detail ?? "Check back at our next service."}
         </p>
-        <OrderLink className="inline-block bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-8 py-4 rounded-lg text-sm font-semibold uppercase tracking-wide transition-colors">
-          Order on Heartland ↗
+        <OrderLink
+          disabled={!orderable}
+          disabledReason={status.detail}
+          className="inline-block bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-8 py-4 rounded-lg text-sm font-semibold uppercase tracking-wide transition-colors"
+        >
+          {orderable ? "Order on Heartland ↗" : "Ordering closed"}
         </OrderLink>
         <p className="mt-4 text-xs text-(--text-muted)">
-          Opens in a new tab ·{" "}
+          {orderable ? "Opens in a new tab" : "Ordering reopens with the truck"} ·{" "}
           <Link href="/order" className="text-(--amber) hover:text-(--text)">
-            Pickup &amp; delivery details
+            Delivery zone &amp; hours
           </Link>
         </p>
       </div>
@@ -198,9 +208,9 @@ function OrderCallout({
       </div>
       <p className="text-(--text-soft) text-sm mt-2">
         The full menu is below.{" "}
-        <OrderLink className="text-(--amber) hover:text-(--text) font-medium">
-          Check availability on Heartland ↗
-        </OrderLink>
+        <span className="text-(--text-muted) font-medium">
+          Ordering reopens with the truck.
+        </span>
       </p>
     </div>
   );

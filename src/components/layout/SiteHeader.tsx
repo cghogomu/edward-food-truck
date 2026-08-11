@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { deriveOpenStatus } from "@/lib/state";
+import { deriveOpenStatus, isOrderable } from "@/lib/state";
 import type { SiteState } from "@/types";
 import { OpenStatusPill } from "@/components/OpenStatusPill";
 import { MobileMenuTrigger } from "@/components/layout/MobileMenuTrigger";
@@ -7,6 +7,7 @@ import { HeaderOrderButton } from "@/components/HeaderOrderButton";
 
 export function SiteHeader({ state }: { state: SiteState }) {
   const status = deriveOpenStatus(state);
+  const orderable = isOrderable(status);
   return (
     <header className="sticky top-0 z-40 bg-(--bg)/85 backdrop-blur-md border-b border-(--color-line)">
       <div className="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
@@ -29,8 +30,8 @@ export function SiteHeader({ state }: { state: SiteState }) {
           <span className="hidden md:inline-flex">
             <OpenStatusPill status={status} compact />
           </span>
-          <HeaderOrderButton />
-          <MobileMenuTrigger />
+          <HeaderOrderButton orderable={orderable} reason={status.detail} />
+          <MobileMenuTrigger orderable={orderable} reason={status.detail} />
         </div>
       </div>
     </header>

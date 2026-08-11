@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { SiteState, CalendarEntry } from "@/types";
+import type { SiteState, ServicePeriod, CalendarEntry } from "@/types";
 
 const PASS_KEY = "iron-oaks-dashboard-auth";
 const DEMO_PASSWORD = "ironoaks";
@@ -68,16 +68,27 @@ export default function DashboardPage() {
         </button>
       </header>
 
-      {/* Inventory — the headline action */}
-      <InventoryControls state={state} onPatch={patch} />
+      {/* One card per service window. Lunch and evening run independently —
+          selling out at lunch leaves the evening's portions alone. */}
+      {state.services.map((service) => (
+        <ServiceControls
+          key={service.id}
+          service={service}
+          onPatch={(changes) =>
+            patch({
+              services: state.services.map((s) =>
+                s.id === service.id ? { ...s, ...changes } : s
+              ),
+            })
+          }
+        />
+      ))}
 
-      {/* Service hours */}
-      <HoursControls state={state} onPatch={patch} />
-
-      {/* Promo banner */}
+      {/* Free delivery offer — drives the home-page headline and the delivery
+          card on "How to order". Off puts the brand line back in the hero. */}
       <SimpleToggle
-        title="Free delivery banner"
-        description="Shows the orange banner at the top of every page."
+        title="Free delivery offer"
+        description="Headlines the home page and marks delivery as free on the order page. Turn off when you start charging."
         value={state.freeDeliveryBanner}
         onChange={(v) => patch({ freeDeliveryBanner: v })}
       />
@@ -142,147 +153,176 @@ function LoginGate({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
-function InventoryControls({
-  state,
+// Day keys must match the `weekday: "short"` values `truckNow()` produces in
+// en-US, since deriveOpenStatus compares them directly against a period's days.
+const DAY_KEYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+/**
+ * Everything for one service window: its portions and its hours. Lunch and
+ * evening each get their own card, and nothing here touches the other one.
+ */
+function ServiceControls({
+  service,
   onPatch,
 }: {
-  state: SiteState;
-  onPatch: (p: Partial<SiteState>) => Promise<void>;
+  service: ServicePeriod;
+  onPatch: (changes: Partial<ServicePeriod>) => Promise<void>;
 }) {
-  const [todayDraft, setTodayDraft] = useState(state.inventory.today);
-  const [maxDraft, setMaxDraft] = useState(state.inventory.max);
   const [busy, setBusy] = useState(false);
+  const isSoldOut = service.soldOut || service.inventory.today <= 0;
+  const isLow =
+    !isSoldOut &&
+    service.inventory.today <= Math.ceil(service.inventory.max * 0.25);
+  const running = service.days.length > 0;
 
-  useEffect(() => {
-    setTodayDraft(state.inventory.today);
-    setMaxDraft(state.inventory.max);
-  }, [state.inventory.today, state.inventory.max]);
-
-  async function applyInventory() {
+  async function run(changes: Partial<ServicePeriod>) {
     setBusy(true);
-    await onPatch({
-      inventory: { today: todayDraft, max: maxDraft },
-      soldOut: todayDraft <= 0,
-    });
+    await onPatch(changes);
     setBusy(false);
   }
-
-  async function markSoldOut() {
-    setBusy(true);
-    await onPatch({ soldOut: true, inventory: { ...state.inventory, today: 0 } });
-    setBusy(false);
-  }
-
-  async function resetToMax() {
-    setBusy(true);
-    await onPatch({
-      soldOut: false,
-      inventory: { ...state.inventory, today: state.inventory.max },
-    });
-    setBusy(false);
-  }
-
-  const isSoldOut = state.soldOut || state.inventory.today <= 0;
 
   return (
     <section className="bg-(--bg-card) border border-(--color-line) rounded-2xl p-6 mb-5">
-      <div className="text-xs uppercase tracking-[0.18em] font-semibold text-(--amber) mb-3">
-        Today&apos;s inventory
-      </div>
-
-      <div className="flex items-end justify-between gap-6 mb-6">
+      <div className="flex items-center justify-between gap-4 mb-5">
         <div>
-          <div className="font-serif text-6xl text-(--text) leading-none">
-            {state.inventory.today}
+          <div className="text-xs uppercase tracking-[0.18em] font-semibold text-(--amber)">
+            {service.label}
           </div>
-          <div className="text-(--text-soft) text-sm mt-2">
-            of {state.inventory.max} portions left
+          <div className="text-(--text-muted) text-xs mt-1">
+            {running
+              ? `${service.open}–${service.close} · ${service.days.length} day${
+                  service.days.length === 1 ? "" : "s"
+                }`
+              : "Not running — pick days below"}
           </div>
         </div>
         <div
           className={`text-xs uppercase tracking-[0.18em] font-semibold px-3 py-1.5 rounded-full border ${
-            isSoldOut
+            !running
+              ? "text-(--text-muted) bg-(--bg) border-(--color-line)"
+              : isSoldOut
               ? "text-(--closed) bg-(--closed)/10 border-(--closed)/30"
-              : state.inventory.today <= Math.ceil(state.inventory.max * 0.25)
+              : isLow
               ? "text-(--amber) bg-(--amber)/10 border-(--amber)/30"
               : "text-(--open) bg-(--open)/10 border-(--open)/30"
           }`}
         >
-          {isSoldOut ? "Sold out" : state.inventory.today <= Math.ceil(state.inventory.max * 0.25) ? "Almost gone" : "Open"}
+          {!running ? "Off" : isSoldOut ? "Sold out" : isLow ? "Almost gone" : "Open"}
+        </div>
+      </div>
+
+      <div className="flex items-end justify-between gap-6 mb-5">
+        <div>
+          <div className="font-serif text-5xl text-(--text) leading-none">
+            {service.inventory.today}
+          </div>
+          <div className="text-(--text-soft) text-sm mt-2">
+            of {service.inventory.max} portions left
+          </div>
         </div>
       </div>
 
       <button
-        onClick={isSoldOut ? resetToMax : markSoldOut}
+        onClick={() =>
+          isSoldOut
+            ? run({
+                soldOut: false,
+                inventory: { ...service.inventory, today: service.inventory.max },
+              })
+            : run({
+                soldOut: true,
+                inventory: { ...service.inventory, today: 0 },
+              })
+        }
         disabled={busy}
-        className={`w-full py-5 rounded-xl text-base font-semibold tracking-wide uppercase transition-colors mb-3 ${
+        className={`w-full py-4 rounded-xl text-sm font-semibold tracking-wide uppercase transition-colors mb-3 ${
           isSoldOut
             ? "bg-(--open)/20 hover:bg-(--open)/30 text-(--open) border border-(--open)/40"
             : "bg-(--closed) hover:bg-(--closed-deep) text-(--text)"
         } disabled:opacity-50`}
       >
-        {isSoldOut ? "Re-open · reset to full" : "Mark sold out for today"}
+        {isSoldOut
+          ? `Re-open ${service.label} · reset to full`
+          : `Mark ${service.label} sold out`}
       </button>
 
       <details className="text-sm">
         <summary className="cursor-pointer text-(--text-soft) hover:text-(--text) py-2">
-          Adjust inventory manually
+          Adjust {service.label.toLowerCase()} portions &amp; hours
         </summary>
-        <div className="grid grid-cols-2 gap-3 mt-3">
-          <label className="block">
-            <span className="text-xs text-(--text-muted) uppercase tracking-wider">
-              Left today
-            </span>
-            <input
-              type="number"
-              value={todayDraft}
-              onChange={(e) => setTodayDraft(Math.max(0, Number(e.target.value)))}
-              className="w-full mt-1 bg-(--bg) border border-(--color-line) rounded-lg px-3 py-2 text-(--text) focus:border-(--amber) outline-hidden"
-            />
-          </label>
-          <label className="block">
-            <span className="text-xs text-(--text-muted) uppercase tracking-wider">
-              Day&apos;s max
-            </span>
-            <input
-              type="number"
-              value={maxDraft}
-              onChange={(e) => setMaxDraft(Math.max(1, Number(e.target.value)))}
-              className="w-full mt-1 bg-(--bg) border border-(--color-line) rounded-lg px-3 py-2 text-(--text) focus:border-(--amber) outline-hidden"
-            />
-          </label>
-          <button
-            onClick={applyInventory}
-            disabled={busy}
-            className="col-span-2 bg-(--bg) border border-(--color-line) hover:border-(--amber) text-(--text) py-2.5 rounded-lg text-sm font-medium"
-          >
-            Apply
-          </button>
-        </div>
+
+        <PortionFields service={service} busy={busy} onApply={run} />
+        <HoursFields service={service} busy={busy} onApply={run} />
       </details>
     </section>
   );
 }
 
-// Day keys must match the `weekday: "short"` values `truckNow()` produces in
-// en-US, since deriveOpenStatus compares them directly against hours.days.
-const DAY_KEYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-function HoursControls({
-  state,
-  onPatch,
+function PortionFields({
+  service,
+  busy,
+  onApply,
 }: {
-  state: SiteState;
-  onPatch: (p: Partial<SiteState>) => Promise<void>;
+  service: ServicePeriod;
+  busy: boolean;
+  onApply: (changes: Partial<ServicePeriod>) => Promise<void>;
 }) {
-  const [open, setOpen] = useState(state.hours.open);
-  const [close, setClose] = useState(state.hours.close);
-  const [days, setDays] = useState<string[]>(state.hours.days);
-  const [busy, setBusy] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [today, setToday] = useState(service.inventory.today);
+  const [max, setMax] = useState(service.inventory.max);
 
-  // No effect syncing drafts back from `state` — this section is the only thing
-  // that edits hours, so after a save the drafts already match what was stored.
+  const dirty =
+    today !== service.inventory.today || max !== service.inventory.max;
+
+  return (
+    <div className="mt-3 pb-5 border-b border-(--color-line)">
+      <div className="text-xs text-(--text-muted) uppercase tracking-wider mb-2">
+        Portions
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block">
+          <span className="text-xs text-(--text-muted)">Left now</span>
+          <input
+            type="number"
+            value={today}
+            onChange={(e) => setToday(Math.max(0, Number(e.target.value)))}
+            className="w-full mt-1 bg-(--bg) border border-(--color-line) rounded-lg px-3 py-2 text-(--text) focus:border-(--amber) outline-hidden"
+          />
+        </label>
+        <label className="block">
+          <span className="text-xs text-(--text-muted)">Batch size</span>
+          <input
+            type="number"
+            value={max}
+            onChange={(e) => setMax(Math.max(1, Number(e.target.value)))}
+            className="w-full mt-1 bg-(--bg) border border-(--color-line) rounded-lg px-3 py-2 text-(--text) focus:border-(--amber) outline-hidden"
+          />
+        </label>
+        <button
+          onClick={() =>
+            onApply({ inventory: { today, max }, soldOut: today <= 0 })
+          }
+          disabled={busy || !dirty}
+          className="col-span-2 bg-(--bg) border border-(--color-line) hover:border-(--amber) text-(--text) py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
+        >
+          Save portions
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function HoursFields({
+  service,
+  busy,
+  onApply,
+}: {
+  service: ServicePeriod;
+  busy: boolean;
+  onApply: (changes: Partial<ServicePeriod>) => Promise<void>;
+}) {
+  const [open, setOpen] = useState(service.open);
+  const [close, setClose] = useState(service.close);
+  const [days, setDays] = useState<string[]>(service.days);
 
   const toMinutes = (t: string) => {
     const [h, m] = t.split(":").map(Number);
@@ -291,18 +331,15 @@ function HoursControls({
 
   // The open/closed check compares plain minute values, so a closing time that
   // wraps past midnight would read as "closed all day". Block it rather than
-  // let Edward save hours that silently hide the truck.
+  // let Edward save hours that silently hide a service.
   const wrapsMidnight = toMinutes(close) <= toMinutes(open);
-  const noDays = days.length === 0;
-  const invalid = wrapsMidnight || noDays;
 
   const dirty =
-    open !== state.hours.open ||
-    close !== state.hours.close ||
-    days.join() !== state.hours.days.join();
+    open !== service.open ||
+    close !== service.close ||
+    days.join() !== service.days.join();
 
   function toggleDay(day: string) {
-    setSaved(false);
     setDays((d) =>
       d.includes(day)
         ? d.filter((x) => x !== day)
@@ -310,58 +347,36 @@ function HoursControls({
     );
   }
 
-  async function save() {
-    if (invalid) return;
-    setBusy(true);
-    await onPatch({ hours: { open, close, days } });
-    setBusy(false);
-    setSaved(true);
-  }
-
   return (
-    <section className="bg-(--bg-card) border border-(--color-line) rounded-2xl p-6 mb-5">
-      <div className="text-xs uppercase tracking-[0.18em] font-semibold text-(--amber) mb-1">
-        Service hours
+    <div className="mt-4">
+      <div className="text-xs text-(--text-muted) uppercase tracking-wider mb-2">
+        Hours · Austin time
       </div>
-      <p className="text-(--text-soft) text-sm mb-5">
-        When the truck shows as open. Times are Austin time.
-      </p>
-
-      <div className="grid grid-cols-2 gap-3 mb-5">
+      <div className="grid grid-cols-2 gap-3 mb-4">
         <label className="block">
-          <span className="text-xs text-(--text-muted) uppercase tracking-wider">
-            Opens
-          </span>
+          <span className="text-xs text-(--text-muted)">Opens</span>
           <input
             type="time"
             value={open}
-            onChange={(e) => {
-              setOpen(e.target.value);
-              setSaved(false);
-            }}
+            onChange={(e) => setOpen(e.target.value)}
             className="w-full mt-1 bg-(--bg) border border-(--color-line) rounded-lg px-3 py-2 text-(--text) focus:border-(--amber) outline-hidden"
           />
         </label>
         <label className="block">
-          <span className="text-xs text-(--text-muted) uppercase tracking-wider">
-            Closes
-          </span>
+          <span className="text-xs text-(--text-muted)">Closes</span>
           <input
             type="time"
             value={close}
-            onChange={(e) => {
-              setClose(e.target.value);
-              setSaved(false);
-            }}
+            onChange={(e) => setClose(e.target.value)}
             className="w-full mt-1 bg-(--bg) border border-(--color-line) rounded-lg px-3 py-2 text-(--text) focus:border-(--amber) outline-hidden"
           />
         </label>
       </div>
 
       <div className="text-xs text-(--text-muted) uppercase tracking-wider mb-2">
-        Days open
+        Days
       </div>
-      <div className="flex flex-wrap gap-2 mb-5">
+      <div className="flex flex-wrap gap-2 mb-4">
         {DAY_KEYS.map((day) => {
           const on = days.includes(day);
           return (
@@ -369,7 +384,7 @@ function HoursControls({
               key={day}
               onClick={() => toggleDay(day)}
               aria-pressed={on}
-              className={`px-3.5 py-2 rounded-lg text-sm font-medium border transition-colors ${
+              className={`px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${
                 on
                   ? "bg-(--amber)/15 text-(--amber) border-(--amber)/40"
                   : "bg-(--bg) text-(--text-muted) border-(--color-line) hover:text-(--text)"
@@ -383,24 +398,24 @@ function HoursControls({
 
       {wrapsMidnight && (
         <p className="text-(--closed) text-sm mb-3">
-          Closing time must be later than opening time. Hours that run past
+          Closing time must be later than opening time. Hours running past
           midnight aren&apos;t supported yet.
         </p>
       )}
-      {noDays && !wrapsMidnight && (
-        <p className="text-(--closed) text-sm mb-3">
-          Pick at least one day, or the truck reads as closed every day.
+      {days.length === 0 && !wrapsMidnight && (
+        <p className="text-(--text-muted) text-sm mb-3">
+          No days selected — this service won&apos;t run at all.
         </p>
       )}
 
       <button
-        onClick={save}
-        disabled={busy || invalid || !dirty}
+        onClick={() => onApply({ open, close, days })}
+        disabled={busy || wrapsMidnight || !dirty}
         className="w-full bg-(--russet) hover:bg-(--russet-deep) text-(--text) py-3 rounded-lg text-sm font-semibold uppercase tracking-wide transition-colors disabled:opacity-50"
       >
-        {busy ? "Saving…" : saved && !dirty ? "Saved" : "Save hours"}
+        Save hours
       </button>
-    </section>
+    </div>
   );
 }
 

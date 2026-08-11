@@ -4,18 +4,20 @@ export const SETTINGS = {
     tagline: "Loaded potatoes · Austin",
     positioning: "Upscale quality, for blue collar pockets.",
   },
-  location: {
-    venue: "Construction Specialties",
-    street: "406 W. Braker Ln.",
-    cityState: "Austin, TX 78753",
-    // No Google Maps / directions link while the truck stop isn't finalised —
-    // the address is shown, but the site doesn't route anyone there yet. To
-    // restore, add:
-    //   directionsUrl: `https://www.google.com/maps/dir/?api=1&destination=${
-    //     encodeURIComponent("406 W Braker Ln, Austin, TX 78753")}`
-    // and link it from the four "Get directions" spots (home, order, calendar,
-    // community) plus the delivery-zone map.
-  },
+  // The pickup location is deliberately absent: Edward is delivery-only for
+  // now, so the truck's parking spot is published nowhere on the site.
+  //
+  // To bring pickup back, restore this block and wire it into the "How to
+  // order" page (a Pickup card beside the delivery one), the home hero, the
+  // calendar header, and the community credit:
+  //   location: {
+  //     venue: "Construction Specialties",
+  //     street: "406 W. Braker Ln.",
+  //     cityState: "Austin, TX 78753",
+  //     directionsUrl: `https://www.google.com/maps/dir/?api=1&destination=${
+  //       encodeURIComponent("406 W Braker Ln, Austin, TX 78753")}`,
+  //   },
+  // The delivery-zone map also has a commented-out truck pin to re-enable.
   contact: {
     phone: "(512) 555-0123",
     ordersEmail: "orders@ironoaks.placeholder",

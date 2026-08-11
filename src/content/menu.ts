@@ -1,72 +1,86 @@
 import type { MenuItem } from "@/types";
 
+/**
+ * Mirrors Edward's Heartland ordering page — names, prices, descriptions and
+ * photos are taken from there, because that's where customers actually order.
+ * If something changes on Heartland, change it here too or the site will quote
+ * a price the checkout won't honour.
+ *
+ * Descriptions are Heartland's own. It stores English and Spanish in a single
+ * field separated by " / "; they're split here so each renders as its own
+ * paragraph.
+ */
 export const MENU: MenuItem[] = [
   {
     id: "brisket",
-    name: "Brisket Loaded Baked Potato",
+    name: "Brisket Baked Potato",
     description:
-      "Hot baked potato with a quarter pound of slow-smoked prime Texas brisket — butter, cheese, sour cream, BBQ sauce, green onions, and sriracha.",
-    price: 15,
-    image: "/menu/brisket-baked-potato.jpg",
+      "Baked Potato dressed with Butter and Cheese, loaded with a quarter-pound of Slow Smoked Brisket and topped with Sour Cream, BBQ Sauce, Green Onions, and Sriracha",
+    descriptionEs:
+      "Papa al horno con mantequilla y queso, cargada con un cuarto de libra de pecho de res ahumado lentamente y cubierta con crema agria, salsa BBQ, cebollín y Sriracha.",
+    price: 15.6,
+    image: "/menu/brisket-potato.jpg",
     tags: ["Signature"],
-    modifiers: [
-      { id: "extra-brisket", name: "Extra brisket", price: 4 },
-      { id: "no-sour", name: "No sour cream" },
-      { id: "no-sriracha", name: "No sriracha" },
-      { id: "no-green-onions", name: "No green onions" },
-      { id: "sauce-side", name: "BBQ sauce on the side" },
-    ],
   },
   {
     id: "chicken-bacon-ranch",
-    name: "Chicken Bacon Ranch Loaded Baked Potato",
+    name: "Chicken Bacon Ranch Baked Potato",
     description:
-      "Hot baked potato with a quarter pound of fire-grilled chicken — smoked bacon, butter, cheese, homemade ranch, jalapeños, green onions, and sriracha.",
-    price: 15,
-    image: "/menu/chicken-bacon-ranch.jpeg",
+      "Baked Potato dressed with Butter and Cheese, loaded with a quarter-pound of fire Grilled Chicken and Crispy Bacon, topped with fresh made Ranch, Chopped Green Onions, Sriracha, and jalapenos",
+    descriptionEs:
+      "Papa al horno con mantequilla y queso, cargada con un cuarto de libra de pollo a la parrilla y tocino crujiente, y cubierta con aderezo ranchero recién preparado, cebollín picado, salsa Sriracha y jalapeños.",
+    price: 15.6,
+    image: "/menu/chicken-bacon-ranch.jpg",
     tags: ["Signature"],
-    modifiers: [
-      { id: "extra-bacon", name: "Extra bacon", price: 2 },
-      { id: "extra-chicken", name: "Extra chicken", price: 3 },
-      { id: "no-jalapenos", name: "No jalapeños" },
-      { id: "no-sriracha", name: "No sriracha" },
-      { id: "no-green-onions", name: "No green onions" },
-      { id: "ranch-side", name: "Ranch on the side" },
-    ],
   },
+
+  // Drinks — Heartland lists each by name at $2.10. Images are Heartland's.
   {
-    id: "breakfast-burrito",
-    name: "Breakfast Burrito",
-    description:
-      "Scrambled eggs, melted cheese, and your choice of meat wrapped in a warm flour tortilla — a hearty way to start the day.",
-    price: 10,
-    image: "/menu/breakfast-burrito.png",
-  },
-  {
-    id: "sausage-wrap",
-    name: "Sausage Wrap",
-    description:
-      "A grilled sausage tucked into a soft, warm tortilla — simple, savory, and ready to go.",
-    price: 5,
-    image: "/menu/sausage-wrap.png",
-  },
-  {
-    id: "cookies",
-    name: "Cookies",
-    description: "Soft-baked and made fresh. The right way to finish.",
-    price: 2,
-    image: "/menu/cookies.jpg",
+    id: "big-red",
+    name: "Big Red 12oz",
+    description: "",
+    price: 2.1,
+    image: "/menu/drinks/big-red.png",
     category: "extra",
   },
   {
-    id: "can-drink",
-    name: "Can Drink",
-    description: "An ice-cold can to wash it all down.",
-    price: 2,
-    image: "/menu/can-drink.jpg",
+    id: "brisk-tea-lemon",
+    name: "Brisk Tea Lemon 12oz",
+    description: "",
+    price: 2.1,
+    image: "/menu/drinks/brisk-tea.png",
+    category: "extra",
+  },
+  {
+    id: "coke",
+    name: "Coke 12oz",
+    description: "",
+    price: 2.1,
+    image: "/menu/drinks/coke.png",
+    category: "extra",
+  },
+  {
+    id: "dr-pepper",
+    name: "Dr. Pepper 12oz",
+    description: "",
+    price: 2.1,
+    image: "/menu/drinks/dr-pepper.png",
+    category: "extra",
+  },
+  {
+    id: "sprite",
+    name: "Sprite 12oz",
+    description: "",
+    price: 2.1,
+    image: "/menu/drinks/sprite.png",
     category: "extra",
   },
 ];
+
+/** Prices carry cents now ($15.60, $2.10) — never render `price` raw. */
+export function formatPrice(price: number): string {
+  return `$${price.toFixed(2)}`;
+}
 
 export function findItem(id: string): MenuItem | undefined {
   return MENU.find((m) => m.id === id);

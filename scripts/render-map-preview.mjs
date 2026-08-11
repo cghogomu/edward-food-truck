@@ -51,8 +51,6 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${hei
         `<path d="${p.d}" fill="none" stroke="#E0A544" stroke-opacity="0.9" stroke-width="1.6"/>`
     )
     .join("\n  ")}
-  <circle cx="${truck.x}" cy="${truck.y}" r="7" fill="#D89A3A" stroke="#1C1A17" stroke-width="2.5"/>
-  <text x="${truck.x + 13}" y="${truck.y + 4}" text-anchor="start" font-family="sans-serif" font-size="13" font-weight="700" fill="#F5EFE5" paint-order="stroke" stroke="#0B0A09" stroke-opacity="0.85" stroke-width="3.5" stroke-linejoin="round">THE TRUCK</text>
   ${polygons
     .map(
       (p) => `<text x="${p.cx}" y="${p.cy}" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="700" fill="#F5EFE5" paint-order="stroke" stroke="#0B0A09" stroke-opacity="0.85" stroke-width="4" stroke-linejoin="round">${p.zip}</text>

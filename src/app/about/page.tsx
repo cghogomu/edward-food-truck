@@ -8,15 +8,24 @@ export default function AboutPage() {
     <div className="max-w-4xl mx-auto px-5 sm:px-8 py-12 sm:py-20">
       <header className="mb-14 sm:mb-20 text-center">
         <p className="text-gold-chrome text-xs uppercase tracking-[0.18em] font-semibold mb-4">
-          Who you're eating with
+          Who you&apos;re eating with
         </p>
         <h1 className="font-serif text-4xl sm:text-6xl leading-[1.05] mb-6">
           Two people.<br />
           <em className="text-(--amber) not-italic">A few potatoes.</em>
         </h1>
+        {/* The positioning line used to open the paragraph below, where it read
+            as ordinary body copy. It's the brand's whole argument, so it gets to
+            stand on its own. Source stays SETTINGS.brand.positioning — the
+            footer and the page description use the same string. */}
+        <blockquote className="mt-8 mb-7 max-w-2xl mx-auto">
+          <p className="font-serif text-2xl sm:text-4xl leading-[1.15] text-gold-chrome">
+            &ldquo;{SETTINGS.brand.positioning}&rdquo;
+          </p>
+        </blockquote>
         <p className="text-(--text-soft) text-lg leading-relaxed max-w-2xl mx-auto">
-          {SETTINGS.brand.positioning} That's the whole pitch. Everything else is
-          execution — and execution is who's making it.
+          That&apos;s the whole pitch. Everything else is execution — and
+          execution is who&apos;s making it.
         </p>
       </header>
 

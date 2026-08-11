@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { COMMUNITY_PARTNERS, COMMUNITY_VALUE, HOST_BUSINESS } from "@/content/spotlight";
-import { SETTINGS } from "@/content/settings";
 
 export default function CommunityPage() {
   return (
@@ -22,7 +21,7 @@ export default function CommunityPage() {
       <section className="mb-16 sm:mb-20">
         <div className="bg-(--bg-card) border border-(--color-line) rounded-2xl p-8 sm:p-10">
           <p className="text-xs uppercase tracking-[0.18em] font-semibold text-(--amber) mb-4">
-            Where we park
+            Who backs us
           </p>
           <h2 className="font-serif text-3xl sm:text-4xl text-(--text) mb-4">
             Thanks to {HOST_BUSINESS.name}
@@ -31,10 +30,12 @@ export default function CommunityPage() {
             {HOST_BUSINESS.blurb}
           </p>
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 pt-6 border-t border-(--color-line)">
+            {/* Their address used to sit here, but it doubled as the truck's
+                parking spot — and Edward is delivery-only for now. The credit
+                stays; the location doesn't. */}
             <div className="text-sm leading-relaxed">
-              <div className="text-(--text) font-medium">{SETTINGS.location.venue}</div>
-              <div className="text-(--text-soft)">{SETTINGS.location.street}</div>
-              <div className="text-(--text-soft)">{SETTINGS.location.cityState}</div>
+              <div className="text-(--text) font-medium">{HOST_BUSINESS.name}</div>
+              <div className="text-(--text-soft)">Austin, TX</div>
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2">
               <a

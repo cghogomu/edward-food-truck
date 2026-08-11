@@ -1,10 +1,20 @@
 import { OrderLink } from "@/components/OrderLink";
 
-export function HeaderOrderButton() {
+export function HeaderOrderButton({
+  orderable,
+  reason,
+}: {
+  orderable: boolean;
+  reason?: string;
+}) {
   return (
-    <OrderLink className="hidden md:inline-flex items-center gap-1.5 bg-(--russet) hover:bg-(--russet-deep) text-(--text) text-sm font-medium px-4 py-2 rounded transition-colors">
-      Order
-      <ExternalIcon />
+    <OrderLink
+      disabled={!orderable}
+      disabledReason={reason}
+      className="hidden md:inline-flex items-center gap-1.5 bg-(--russet) hover:bg-(--russet-deep) text-(--text) text-sm font-medium px-4 py-2 rounded transition-colors"
+    >
+      {orderable ? "Order" : "Closed"}
+      {orderable && <ExternalIcon />}
     </OrderLink>
   );
 }

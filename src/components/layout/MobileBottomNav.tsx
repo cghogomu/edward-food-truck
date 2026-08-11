@@ -67,7 +67,13 @@ function isActive(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(href + "/");
 }
 
-export function MobileBottomNav() {
+export function MobileBottomNav({
+  orderable,
+  reason,
+}: {
+  orderable: boolean;
+  reason?: string;
+}) {
   const pathname = usePathname();
   return (
     <nav
@@ -101,7 +107,12 @@ export function MobileBottomNav() {
           return (
             <li key={item.href} className="flex-1 relative">
               {item.external ? (
-                <OrderLink className={tabClass} ariaLabel="Order on Heartland (opens in a new tab)">
+                <OrderLink
+                  className={tabClass}
+                  disabled={!orderable}
+                  disabledReason={reason}
+                  ariaLabel="Order on Heartland (opens in a new tab)"
+                >
                   {body}
                 </OrderLink>
               ) : (

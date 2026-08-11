@@ -125,14 +125,18 @@ Repo: https://github.com/cghogomu/edward-food-truck (`master` → auto-deploys t
 - [ ] **Custom domain** — swap in Edward's real domain once available
       (Vercel → Settings → Domains). The `*.vercel.app` URL is the portfolio
       stand-in until then.
-- [ ] **Replace the can-drink stock photo** — it's now self-hosted, but the shot
-      is a branded Coca-Cola can being used to sell a generic $2 "Can Drink."
-      Swap for an unbranded can (or one of Edward's own photos) before this is
-      treated as final. The cookies photo is generic and fine.
-      *Raised and consciously deferred 2026-08-05 — revisit before the custom
-      domain goes live, not urgent for the portfolio demo.*
-- [ ] **Real photos for cookies + drinks** — both are still stock. Ask Edward for
-      shots of what he actually sells.
+- [x] **Menu matched to Heartland** — names, prices, descriptions and photos now
+      come from the Heartland ordering page, so the site can't quote a price
+      checkout won't honour. Prices gained cents ($15.60, $2.10), which the old
+      raw `${item.price}` would have rendered as "$15.6" — added `formatPrice`.
+      Breakfast Burrito, Sausage Wrap and Cookies removed (not on Heartland);
+      "Can Drink" became five named drinks. Descriptions are Heartland's own
+      bilingual copy, split so Spanish reads as its own paragraph *(2026-08-11)*
+- [x] **Stock food & drink photos are gone** — closes both the branded-Coke
+      concern and the "real photos" item. The menu now carries Heartland's own
+      photos of Edward's actual potatoes, and the generic "Can Drink" is five
+      named drinks with their real product shots, so naming the brands is
+      accurate rather than implied *(2026-08-11)*
 
 ## Notes
 
