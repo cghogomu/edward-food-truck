@@ -13,18 +13,10 @@ import {
 export function DeliveryAreaMap() {
   const { width, height } = ZONE_VIEWBOX;
 
+  // No caption inside this card — whatever section embeds it already names the
+  // zone, and two headings stacked on one map read as a mistake.
   return (
-    <figure className="bg-(--bg-card) border border-(--color-line) rounded-2xl p-6 sm:p-8">
-      <figcaption className="mb-5">
-        <p className="text-gold-chrome text-xs uppercase tracking-[0.18em] font-semibold mb-2">
-          Free delivery zone
-        </p>
-        <p className="text-(--text-soft) text-sm leading-relaxed">
-          {DELIVERY_ZIPS.size} ZIP codes across north Austin, Round Rock, and
-          Pflugerville. Shapes are the real postal boundaries.
-        </p>
-      </figcaption>
-
+    <figure className="bg-(--bg-card) border border-(--color-line) rounded-2xl p-4 sm:p-6">
       <div className="relative w-full max-w-md mx-auto">
         <svg
           viewBox={`0 0 ${width} ${height}`}

@@ -19,7 +19,8 @@ export default function AboutPage() {
             stand on its own. Source stays SETTINGS.brand.positioning — the
             footer and the page description use the same string. */}
         <blockquote className="mt-8 mb-7 max-w-2xl mx-auto">
-          <p className="font-serif text-2xl sm:text-4xl leading-[1.15] text-gold-chrome">
+          {/* Same descender clipping as the home hero — see .text-gold-chrome. */}
+          <p className="font-serif text-2xl sm:text-4xl leading-[1.3] pb-[0.08em] text-gold-chrome">
             &ldquo;{SETTINGS.brand.positioning}&rdquo;
           </p>
         </blockquote>

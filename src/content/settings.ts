@@ -1,7 +1,8 @@
 export const SETTINGS = {
   brand: {
     name: "Iron Oaks",
-    tagline: "Loaded potatoes · Austin",
+    // The gold eyebrow above the home-page headline.
+    tagline: "Loaded Baked Potatoes",
     positioning: "Upscale quality, for blue collar pockets.",
   },
   // The pickup location is deliberately absent: Edward is delivery-only for

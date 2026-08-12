@@ -72,6 +72,9 @@ button, a {
 /* Polished chrome-gold gradient — bright highlight fading to deep base,
    the way light rolls off the truck's gold wheel spokes. Use on large
    gold elements (hero accents, wordmark); too fine for small caps. */
+/* Gradient text. Because it paints through background-clip, the glyphs are
+   clipped to the element's box — so any use with descenders (y, g, p) needs
+   enough line-height, or a little bottom padding, or they get sliced off. */
 .text-gold-chrome {
   background: linear-gradient(177deg, #FBEBBE 0%, #ECC868 34%, #C99A3E 64%, #936E2C 100%);
   -webkit-background-clip: text;
