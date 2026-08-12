@@ -5,10 +5,13 @@ import { Redis } from "@upstash/redis";
 import type {
   SiteState,
   LegacySiteState,
+  LegacyServicePeriod,
   ServicePeriod,
+  ItemStock,
   OpenStatus,
   CalendarEntry,
 } from "@/types";
+import { MAIN_ITEMS } from "@/content/menu";
 
 const STATE_FILE = path.join(process.cwd(), "data", "site-state.json");
 const STATE_KEY = "edward-food-truck:site-state";
@@ -23,22 +26,101 @@ const hasRedis =
   process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
 const redis = hasRedis ? Redis.fromEnv() : null;
 
+const DEFAULT_MAX = 20;
+
+/** Portions left in a window — always the sum of its per-item counts. */
+export function periodRemaining(p: ServicePeriod): number {
+  return p.stock.reduce((n, s) => n + s.today, 0);
+}
+
+export function periodMax(p: ServicePeriod): number {
+  return p.stock.reduce((n, s) => n + s.max, 0);
+}
+
 /**
- * State stored before service periods existed has a single `hours`/`inventory`
- * pair. That shape is live in production Redis, so every read is normalised
- * rather than trusted.
- *
- * The old hours become the FIRST period untouched, so migrating can't silently
- * change when the truck appears to be open. The second period is added with
- * sensible times but no days selected — inactive until Edward turns it on,
- * because inventing an evening service he isn't running would be worse than
- * making him tick five boxes.
+ * Split one window-wide portion count across the potatoes, preserving the
+ * total exactly — the first item absorbs the remainder so 15 across two items
+ * becomes 8 + 7 rather than 7 + 7 and a lost portion.
  */
-function migrate(raw: SiteState | LegacySiteState): SiteState {
-  if (Array.isArray((raw as SiteState).services)) return raw as SiteState;
+function splitEvenly(total: number, parts: number): number[] {
+  if (parts <= 0) return [];
+  const base = Math.floor(total / parts);
+  const rem = total - base * parts;
+  return Array.from({ length: parts }, (_, i) => base + (i < rem ? 1 : 0));
+}
+
+/**
+ * Guarantees every potato on the menu has a stock row, and drops rows for
+ * items that have left the menu. Without this, adding a potato to menu.ts
+ * would show it as permanently sold out.
+ */
+function normaliseStock(stock: ItemStock[]): ItemStock[] {
+  const fallbackMax = stock.length
+    ? Math.max(...stock.map((s) => s.max))
+    : DEFAULT_MAX;
+  return MAIN_ITEMS.map((item) => {
+    const found = stock.find((s) => s.itemId === item.id);
+    return found ?? { itemId: item.id, today: fallbackMax, max: fallbackMax };
+  });
+}
+
+function isLegacyPeriod(
+  p: ServicePeriod | LegacyServicePeriod
+): p is LegacyServicePeriod {
+  return !Array.isArray((p as ServicePeriod).stock);
+}
+
+/**
+ * State written before per-item stock, and before service windows at all, is
+ * still live in production Redis. Every read is normalised rather than trusted.
+ *
+ * Pre-windows state puts its hours into the FIRST window untouched, so
+ * migrating can't change when the truck appears open; the second window is
+ * added inactive rather than inventing an evening service. A window-wide
+ * portion count is split evenly across the potatoes, which keeps the total the
+ * customer already saw.
+ */
+function migrate(
+  raw: SiteState | LegacySiteState | { services: LegacyServicePeriod[] }
+): SiteState {
+  const asNew = raw as SiteState;
+
+  if (Array.isArray(asNew.services)) {
+    return {
+      ...asNew,
+      services: (asNew.services as Array<ServicePeriod | LegacyServicePeriod>).map(
+        (p) => {
+          if (!isLegacyPeriod(p)) {
+            return { ...p, stock: normaliseStock(p.stock) };
+          }
+          const totalMax = p.inventory?.max ?? DEFAULT_MAX * MAIN_ITEMS.length;
+          // Missing counts mean "we have no idea", not "sold out" — default to
+          // a full batch so a malformed record can't silently close the truck.
+          const todays = splitEvenly(p.inventory?.today ?? totalMax, MAIN_ITEMS.length);
+          const maxes = splitEvenly(totalMax, MAIN_ITEMS.length);
+          // Drop the old single-count field; `stock` replaces it.
+          const rest: Omit<LegacyServicePeriod, "inventory"> & {
+            inventory?: unknown;
+          } = { ...p };
+          delete rest.inventory;
+          return {
+            ...(rest as Omit<LegacyServicePeriod, "inventory">),
+            stock: MAIN_ITEMS.map((item, i) => ({
+              itemId: item.id,
+              today: todays[i] ?? 0,
+              max: maxes[i] ?? DEFAULT_MAX,
+            })),
+          };
+        }
+      ),
+    };
+  }
 
   const legacy = raw as LegacySiteState;
-  const max = legacy.inventory?.max ?? 20;
+  const max = legacy.inventory?.max ?? DEFAULT_MAX * MAIN_ITEMS.length;
+  const todays = splitEvenly(legacy.inventory?.today ?? max, MAIN_ITEMS.length);
+  const maxes = splitEvenly(max, MAIN_ITEMS.length);
+
   const services: ServicePeriod[] = [
     {
       id: "lunch",
@@ -46,7 +128,11 @@ function migrate(raw: SiteState | LegacySiteState): SiteState {
       open: legacy.hours?.open ?? "11:00",
       close: legacy.hours?.close ?? "14:00",
       days: legacy.hours?.days ?? [],
-      inventory: legacy.inventory ?? { today: max, max },
+      stock: MAIN_ITEMS.map((item, i) => ({
+        itemId: item.id,
+        today: todays[i] ?? 0,
+        max: maxes[i] ?? DEFAULT_MAX,
+      })),
       soldOut: legacy.soldOut ?? false,
     },
     {
@@ -55,7 +141,11 @@ function migrate(raw: SiteState | LegacySiteState): SiteState {
       open: "17:00",
       close: "20:00",
       days: [],
-      inventory: { today: max, max },
+      stock: MAIN_ITEMS.map((item, i) => ({
+        itemId: item.id,
+        today: maxes[i] ?? DEFAULT_MAX,
+        max: maxes[i] ?? DEFAULT_MAX,
+      })),
       soldOut: false,
     },
   ];
@@ -173,7 +263,17 @@ function describe(periods: ServicePeriod[]): string {
 }
 
 function isSoldOut(p: ServicePeriod): boolean {
-  return p.soldOut || p.inventory.today <= 0;
+  return p.soldOut || periodRemaining(p) <= 0;
+}
+
+/** Per-potato counts for the public status, named for display. */
+function stockFor(p: ServicePeriod) {
+  return p.stock.map((s) => ({
+    itemId: s.itemId,
+    name: MAIN_ITEMS.find((m) => m.id === s.itemId)?.name ?? s.itemId,
+    today: s.today,
+    max: s.max,
+  }));
 }
 
 /**
@@ -270,15 +370,17 @@ export function deriveOpenStatus(state: SiteState): OpenStatus {
           };
     }
 
-    const low =
-      active.inventory.today <= Math.ceil(active.inventory.max * 0.25);
+    const remaining = periodRemaining(active);
+    const max = periodMax(active);
+    const low = remaining <= Math.ceil(max * 0.25);
     return {
       state: low ? "low" : "open",
       label: low ? "Almost gone" : "Open now",
-      detail: `${active.label} · ${active.inventory.today} of ${active.inventory.max} portions left`,
-      remaining: active.inventory.today,
-      max: active.inventory.max,
+      detail: `${active.label} · ${remaining} of ${max} portions left`,
+      remaining,
+      max,
       periodLabel: active.label,
+      stock: stockFor(active),
     };
   }
 
@@ -291,9 +393,10 @@ export function deriveOpenStatus(state: SiteState): OpenStatus {
       state: "closed",
       label: "Closed right now",
       detail: `${next.label} starts at ${formatTime(next.open)}`,
-      remaining: next.inventory.today,
-      max: next.inventory.max,
+      remaining: periodRemaining(next),
+      max: periodMax(next),
       periodLabel: next.label,
+      stock: stockFor(next),
     };
   }
 

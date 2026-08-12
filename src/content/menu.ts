@@ -77,6 +77,12 @@ export const MENU: MenuItem[] = [
   },
 ];
 
+/**
+ * The potatoes. Drinks aren't counted — Edward doesn't run out of cans the way
+ * he runs out of brisket, so only these carry per-window stock.
+ */
+export const MAIN_ITEMS = MENU.filter((m) => m.category !== "extra");
+
 /** Prices carry cents now ($15.60, $2.10) — never render `price` raw. */
 export function formatPrice(price: number): string {
   return `$${price.toFixed(2)}`;

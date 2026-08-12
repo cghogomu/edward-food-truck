@@ -12,6 +12,14 @@ export type CalendarEntry = {
  * hours, days and portion count. Selling out at lunch must not close the
  * evening, so inventory and soldOut live here rather than on SiteState.
  */
+/** Portions of one menu item left in one service window. */
+export type ItemStock = {
+  /** Matches a MenuItem id. */
+  itemId: string;
+  today: number;
+  max: number;
+};
+
 export type ServicePeriod = {
   id: string;
   /** Shown to customers, e.g. "Lunch". */
@@ -20,10 +28,13 @@ export type ServicePeriod = {
   close: string;
   /** Empty means this period isn't running at all right now. */
   days: string[];
-  inventory: {
-    today: number;
-    max: number;
-  };
+  /**
+   * Counted per potato, so the site can say which one has run out. The
+   * window's total is always the sum of these — never stored separately, or
+   * the two drift.
+   */
+  stock: ItemStock[];
+  /** Manual "stop taking orders" for the whole window, regardless of counts. */
   soldOut: boolean;
 };
 
@@ -32,6 +43,17 @@ export type SiteState = {
   freeDeliveryBanner: boolean;
   today: string;
   calendar: CalendarEntry[];
+};
+
+/** A service window before stock was counted per item. */
+export type LegacyServicePeriod = {
+  id: string;
+  label: string;
+  open: string;
+  close: string;
+  days: string[];
+  inventory: { today: number; max: number };
+  soldOut: boolean;
 };
 
 /** Shape stored before service periods existed. Still live in Redis. */
@@ -53,6 +75,8 @@ export type OpenStatus = {
   cateringClient?: string;
   /** Which window this refers to, when one is running or coming up next. */
   periodLabel?: string;
+  /** Per-potato counts for that window, so customers can see what's left. */
+  stock?: Array<{ itemId: string; name: string; today: number; max: number }>;
 };
 
 export type MenuItem = {

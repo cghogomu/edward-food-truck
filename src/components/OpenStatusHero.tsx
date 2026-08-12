@@ -54,9 +54,42 @@ export function OpenStatusHero({ status }: { status: OpenStatus }) {
         </div>
 
         {showOrder && (
-          <OrderLink className="bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-5 py-3 rounded-lg text-sm font-semibold tracking-wide uppercase transition-colors">
-            Order now
-          </OrderLink>
+          <div className="shrink-0">
+            <OrderLink className="block text-center bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-5 py-3 rounded-lg text-sm font-semibold tracking-wide uppercase transition-colors">
+              Order now
+            </OrderLink>
+
+            {/* What's actually left, per potato — so nobody clicks through to
+                Heartland only to find the one they wanted is gone. */}
+            {status.stock && status.stock.length > 0 && (
+              <ul className="mt-3 space-y-1.5 text-sm">
+                {status.stock.map((s) => {
+                  const out = s.today <= 0;
+                  return (
+                    <li
+                      key={s.itemId}
+                      className="flex items-baseline justify-between gap-4"
+                    >
+                      <span
+                        className={out ? "text-(--text-muted) line-through" : "text-(--text-soft)"}
+                      >
+                        {s.name.replace(/ Baked Potato$/, "")}
+                      </span>
+                      <span
+                        className={
+                          out
+                            ? "text-(--closed) font-medium whitespace-nowrap"
+                            : "text-(--amber) font-medium whitespace-nowrap"
+                        }
+                      >
+                        {out ? "Sold out" : `${s.today} left`}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
         )}
       </div>
 

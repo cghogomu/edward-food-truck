@@ -12,16 +12,24 @@
         "Thu",
         "Fri"
       ],
-      "inventory": {
-        "today": 20,
-        "max": 20
-      },
-      "soldOut": false
+      "soldOut": false,
+      "stock": [
+        {
+          "itemId": "brisket",
+          "today": 14,
+          "max": 20
+        },
+        {
+          "itemId": "chicken-bacon-ranch",
+          "today": 19,
+          "max": 20
+        }
+      ]
     },
     {
       "id": "evening",
       "label": "Evening",
-      "open": "15:00",
+      "open": "16:00",
       "close": "20:00",
       "days": [
         "Mon",
@@ -30,11 +38,19 @@
         "Thu",
         "Fri"
       ],
-      "inventory": {
-        "today": 20,
-        "max": 20
-      },
-      "soldOut": false
+      "soldOut": false,
+      "stock": [
+        {
+          "itemId": "brisket",
+          "today": 17,
+          "max": 20
+        },
+        {
+          "itemId": "chicken-bacon-ranch",
+          "today": 19,
+          "max": 20
+        }
+      ]
     }
   ],
   "freeDeliveryBanner": true,

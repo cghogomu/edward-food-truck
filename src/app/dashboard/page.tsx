@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { SiteState, ServicePeriod, CalendarEntry } from "@/types";
+import type { SiteState, ServicePeriod, ItemStock, CalendarEntry } from "@/types";
+import { MAIN_ITEMS } from "@/content/menu";
 
 const PASS_KEY = "iron-oaks-dashboard-auth";
 const DEMO_PASSWORD = "ironoaks";
@@ -161,6 +162,11 @@ const DAY_KEYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
  * Everything for one service window: its portions and its hours. Lunch and
  * evening each get their own card, and nothing here touches the other one.
  */
+/**
+ * Everything for one service window: a portion count per potato, and the
+ * window's hours. Lunch and evening are independent — selling out at lunch
+ * leaves the evening's counts alone.
+ */
 function ServiceControls({
   service,
   onPatch,
@@ -169,10 +175,10 @@ function ServiceControls({
   onPatch: (changes: Partial<ServicePeriod>) => Promise<void>;
 }) {
   const [busy, setBusy] = useState(false);
-  const isSoldOut = service.soldOut || service.inventory.today <= 0;
-  const isLow =
-    !isSoldOut &&
-    service.inventory.today <= Math.ceil(service.inventory.max * 0.25);
+  const remaining = service.stock.reduce((n, s) => n + s.today, 0);
+  const max = service.stock.reduce((n, s) => n + s.max, 0);
+  const isSoldOut = service.soldOut || remaining <= 0;
+  const isLow = !isSoldOut && remaining <= Math.ceil(max * 0.25);
   const running = service.days.length > 0;
 
   async function run(changes: Partial<ServicePeriod>) {
@@ -211,15 +217,34 @@ function ServiceControls({
         </div>
       </div>
 
-      <div className="flex items-end justify-between gap-6 mb-5">
-        <div>
-          <div className="font-serif text-5xl text-(--text) leading-none">
-            {service.inventory.today}
-          </div>
-          <div className="text-(--text-soft) text-sm mt-2">
-            of {service.inventory.max} portions left
-          </div>
+      <div className="mb-5">
+        <div className="font-serif text-5xl text-(--text) leading-none">
+          {remaining}
         </div>
+        <div className="text-(--text-soft) text-sm mt-2">
+          of {max} portions left
+        </div>
+      </div>
+
+      {/* Per-potato counts — the customer sees these on the home page, so a
+          quick tap here is what tells them a brisket is still available. */}
+      <div className="space-y-2 mb-5">
+        {service.stock.map((s) => (
+          <StockRow
+            key={s.itemId}
+            stock={s}
+            busy={busy}
+            onChange={(today) =>
+              run({
+                stock: service.stock.map((x) =>
+                  x.itemId === s.itemId ? { ...x, today } : x
+                ),
+                // Any potato back in stock clears a manual sell-out.
+                soldOut: today > 0 ? false : service.soldOut,
+              })
+            }
+          />
+        ))}
       </div>
 
       <button
@@ -227,11 +252,11 @@ function ServiceControls({
           isSoldOut
             ? run({
                 soldOut: false,
-                inventory: { ...service.inventory, today: service.inventory.max },
+                stock: service.stock.map((s) => ({ ...s, today: s.max })),
               })
             : run({
                 soldOut: true,
-                inventory: { ...service.inventory, today: 0 },
+                stock: service.stock.map((s) => ({ ...s, today: 0 })),
               })
         }
         disabled={busy}
@@ -242,23 +267,71 @@ function ServiceControls({
         } disabled:opacity-50`}
       >
         {isSoldOut
-          ? `Re-open ${service.label} · reset to full`
+          ? `Re-open ${service.label} · reset all to full`
           : `Mark ${service.label} sold out`}
       </button>
 
       <details className="text-sm">
         <summary className="cursor-pointer text-(--text-soft) hover:text-(--text) py-2">
-          Adjust {service.label.toLowerCase()} portions &amp; hours
+          Batch sizes &amp; hours
         </summary>
-
-        <PortionFields service={service} busy={busy} onApply={run} />
+        <BatchFields service={service} busy={busy} onApply={run} />
         <HoursFields service={service} busy={busy} onApply={run} />
       </details>
     </section>
   );
 }
 
-function PortionFields({
+/** One potato's remaining count, with −/+ for the common case of selling one. */
+function StockRow({
+  stock,
+  busy,
+  onChange,
+}: {
+  stock: ItemStock;
+  busy: boolean;
+  onChange: (today: number) => void;
+}) {
+  const name = MAIN_ITEMS.find((m) => m.id === stock.itemId)?.name ?? stock.itemId;
+  const out = stock.today <= 0;
+
+  return (
+    <div className="flex items-center justify-between gap-3 bg-(--bg) border border-(--color-line) rounded-lg px-4 py-3">
+      <div className="min-w-0">
+        <div className={`text-sm ${out ? "text-(--text-muted)" : "text-(--text)"}`}>
+          {name}
+        </div>
+        <div className="text-xs text-(--text-muted) mt-0.5">
+          {out ? "Sold out" : `${stock.today} of ${stock.max} left`}
+        </div>
+      </div>
+      <div className="flex items-center gap-2 shrink-0">
+        <button
+          onClick={() => onChange(Math.max(0, stock.today - 1))}
+          disabled={busy || stock.today <= 0}
+          aria-label={`One fewer ${name}`}
+          className="w-9 h-9 rounded-lg border border-(--color-line) text-(--text) hover:border-(--amber) disabled:opacity-40 disabled:hover:border-(--color-line)"
+        >
+          −
+        </button>
+        <span className="w-8 text-center font-serif text-xl text-(--text)">
+          {stock.today}
+        </span>
+        <button
+          onClick={() => onChange(Math.min(stock.max, stock.today + 1))}
+          disabled={busy || stock.today >= stock.max}
+          aria-label={`One more ${name}`}
+          className="w-9 h-9 rounded-lg border border-(--color-line) text-(--text) hover:border-(--amber) disabled:opacity-40 disabled:hover:border-(--color-line)"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** How many of each potato Edward makes for this window. */
+function BatchFields({
   service,
   busy,
   onApply,
@@ -267,42 +340,60 @@ function PortionFields({
   busy: boolean;
   onApply: (changes: Partial<ServicePeriod>) => Promise<void>;
 }) {
-  const [today, setToday] = useState(service.inventory.today);
-  const [max, setMax] = useState(service.inventory.max);
+  const [draft, setDraft] = useState(service.stock);
 
   const dirty =
-    today !== service.inventory.today || max !== service.inventory.max;
+    draft.map((d) => `${d.itemId}:${d.today}:${d.max}`).join() !==
+    service.stock.map((d) => `${d.itemId}:${d.today}:${d.max}`).join();
+
+  function set(itemId: string, field: "today" | "max", value: number) {
+    setDraft((d) =>
+      d.map((x) => (x.itemId === itemId ? { ...x, [field]: Math.max(0, value) } : x))
+    );
+  }
 
   return (
     <div className="mt-3 pb-5 border-b border-(--color-line)">
       <div className="text-xs text-(--text-muted) uppercase tracking-wider mb-2">
-        Portions
+        Portions per potato
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        <label className="block">
-          <span className="text-xs text-(--text-muted)">Left now</span>
-          <input
-            type="number"
-            value={today}
-            onChange={(e) => setToday(Math.max(0, Number(e.target.value)))}
-            className="w-full mt-1 bg-(--bg) border border-(--color-line) rounded-lg px-3 py-2 text-(--text) focus:border-(--amber) outline-hidden"
-          />
-        </label>
-        <label className="block">
-          <span className="text-xs text-(--text-muted)">Batch size</span>
-          <input
-            type="number"
-            value={max}
-            onChange={(e) => setMax(Math.max(1, Number(e.target.value)))}
-            className="w-full mt-1 bg-(--bg) border border-(--color-line) rounded-lg px-3 py-2 text-(--text) focus:border-(--amber) outline-hidden"
-          />
-        </label>
+      <div className="space-y-3">
+        {draft.map((s) => (
+          <div key={s.itemId}>
+            <div className="text-xs text-(--text-soft) mb-1">
+              {MAIN_ITEMS.find((m) => m.id === s.itemId)?.name ?? s.itemId}
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block">
+                <span className="text-xs text-(--text-muted)">Left now</span>
+                <input
+                  type="number"
+                  value={s.today}
+                  onChange={(e) => set(s.itemId, "today", Number(e.target.value))}
+                  className="w-full mt-1 bg-(--bg) border border-(--color-line) rounded-lg px-3 py-2 text-(--text) focus:border-(--amber) outline-hidden"
+                />
+              </label>
+              <label className="block">
+                <span className="text-xs text-(--text-muted)">Batch size</span>
+                <input
+                  type="number"
+                  value={s.max}
+                  onChange={(e) => set(s.itemId, "max", Number(e.target.value))}
+                  className="w-full mt-1 bg-(--bg) border border-(--color-line) rounded-lg px-3 py-2 text-(--text) focus:border-(--amber) outline-hidden"
+                />
+              </label>
+            </div>
+          </div>
+        ))}
         <button
           onClick={() =>
-            onApply({ inventory: { today, max }, soldOut: today <= 0 })
+            onApply({
+              stock: draft,
+              soldOut: draft.every((d) => d.today <= 0),
+            })
           }
           disabled={busy || !dirty}
-          className="col-span-2 bg-(--bg) border border-(--color-line) hover:border-(--amber) text-(--text) py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
+          className="w-full bg-(--bg) border border-(--color-line) hover:border-(--amber) text-(--text) py-2.5 rounded-lg text-sm font-medium disabled:opacity-50"
         >
           Save portions
         </button>
