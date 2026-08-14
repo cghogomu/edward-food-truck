@@ -145,11 +145,33 @@ resolvers before concluding anything is broken.
 - [x] **`/api/state` is locked** — server-side password check, deployed and
       verified in production *(2026-08-14)*
 - [x] **The dashboard no longer prints its password** *(2026-08-14)*
-- [ ] Placeholder contact details render in the footer sitewide: phone
-      `(512) 555-0123` (reserved fake range) and Instagram `@ironoaks`
-      (unconfirmed). **Needs Edward's real phone and Instagram, or both come
-      out.** `ordersEmail` / `cateringEmail` are fake but render nowhere.
+- [x] **Real contact details** — footer now carries Edward's actual phone
+      `(512) 945-6117` and Instagram `@ironoaksatx`, both as links (the number
+      dials, the handle opens the profile). The orphaned Stripe success page had
+      the fake number hardcoded a second time; it reads `SETTINGS` now, so there
+      is one place to change it. Edward may swap in a separate work line later.
+      `ordersEmail` / `cateringEmail` are still placeholders but render nowhere
+      *(2026-08-14)*
 - [ ] Seven community partners still show "Description coming soon".
+
+### ⏳ The only thing still in flight — read this first on Monday
+
+**Nothing is blocked on a person.** The site, the lock and the real contact
+details are all deployed and verified. What's left finishes by itself:
+
+1. **DNS propagation.** As of Friday afternoon `www.ironoaksbbq.com` had flipped
+   over on every public resolver checked; the apex was still stale on Google,
+   Cloudflare, OpenDNS and Verisign, with Quad9 already correct. HostGator's own
+   nameservers serve the right answer, so this is only other people's caches
+   expiring.
+2. **The HTTPS certificate.** Vercel issues it automatically once it sees the
+   DNS pointing at it — as of Friday it had not yet (TLS to `216.198.79.1` with
+   this domain's SNI still failed). No action needed; hitting **Refresh** on the
+   domain row in Vercel → Settings → Domains just asks it to re-check sooner.
+
+**Monday check, ~30 seconds:** open `https://ironoaksbbq.com`. If the site loads
+with a padlock, it's done. If not, the Vercel domain row will say what it's
+waiting on, and `dig +short A ironoaksbbq.com` should return `216.198.79.1`.
 
 ## To do
 
