@@ -88,75 +88,88 @@ Repo: https://github.com/cghogomu/edward-food-truck (`master` → auto-deploys t
       Edward was sent was a Gmail `google.com/url?q=` wrapper; stripped it so
       customers go straight to Heartland *(2026-08-05)*
 
-## 📍 Where we left off — 2026-08-14
+## 📍 Where we left off — 2026-08-14 (afternoon)
 
-**Local is 3 commits ahead of production.** Nothing since 2026-08-05 is deployed.
+**Everything is deployed.** Production and local `master` both sit at `83e2870`.
 
-| | |
-|---|---|
-| Local `master` | `0e588a8` — working tree clean |
-| Production | `5cd45a7` — still shows the old menu, pickup address, single service window, stock truck photo, promo bar |
+The five commits that had been sitting unpushed since 2026-08-05 went out
+together: lunch/evening split + Heartland menu (`035881e`), per-potato stock
+(`3f196c4`), home page rework (`0e588a8`), the TODO log (`e81f9e2`), and the
+dashboard auth fix (`83e2870`).
 
-Unpushed: `035881e` (lunch/evening + menu matched to Heartland), `3f196c4`
-(per-potato stock), `0e588a8` (home page rework + gold-text clipping fix).
+Verified against production after the deploy: unauthenticated `POST /api/state`
+returns 401, the public `GET` still returns 200, `/dashboard` no longer prints a
+password, and the menu renders Heartland's prices with cents (`$15.60`, `$2.10`).
+The Redis schema migration through both hops (single `hours`/`inventory` → lunch
++ evening → per-potato stock) ran on the first production read without incident.
 
-**Deploying is one command — `git push origin master`.** Vercel auto-builds.
-The one thing to watch is the first production read: it migrates the live Redis
-state through both schema hops at once (single `hours`/`inventory` → lunch +
-evening windows → per-potato stock). Both hops were tested locally against real
-state; existing hours land in Lunch untouched, Evening arrives switched off, and
-the portion total splits across the potatoes without changing the number.
+Dev server: `npm run dev`. The dashboard is at `/dashboard`; locally the
+password falls back to `ironoaks` when `DASHBOARD_PASSWORD` is unset.
 
-Restart the dev server with `npm run dev` (serves the site and the dashboard —
-`/dashboard`, password `ironoaks`).
+### 🌐 Custom domain — ironoaksbbq.com (propagating)
 
-### 🌐 Custom domain — ironoaksbbq.com (in progress)
+**Registrar is Network Solutions, not HostGator** — the earlier note here had
+this wrong. Registered 2026-08-13, paid through 2029. HostGator only runs DNS
+(nameservers `hgns1`/`hgns2.hostgator.com`), so a *nameserver* change would need
+a Network Solutions login we don't have. We didn't need one.
 
-Domain is registered and **already pointing at HostGator** (nameservers
-`hgns1`/`hgns2.hostgator.com`, A record `129.121.64.244`). Nothing real is
-served there — the HTTPS cert is HostGator's parked-domain default
-(`rue.jes.temporary.site`).
+**Done 2026-08-14:** both `ironoaksbbq.com` and `www.ironoaksbbq.com` added to
+the Vercel project (Production, apex-primary — the "redirect apex to www" box
+was deliberately unchecked so the short name is canonical in print). In cPanel →
+Zone Editor the apex `A` record was changed `66.235.200.170` → `216.198.79.1`
+(Vercel) and its TTL dropped 14400 → 3600. `www` was already a CNAME to the apex
+and needed no change. Every mail and hosting record was left untouched.
 
-- **Edward owns the HostGator account**; its contact address is
-  `ironoaksllc@gmail.com`.
+**Waiting on:** DNS propagation. The old record carried a 4-hour TTL, so
+resolvers flip over at different times — mid-flight it is normal to see Google
+and Cloudflare DNS disagree with Quad9 and OpenDNS, and even to see apex and
+`www` disagree with each other. HostGator's own nameservers also briefly served
+**both** values authoritatively depending on query path. None of that indicates a
+failed edit. Verify with `dig @hgns1.hostgator.com` plus several public
+resolvers before concluding anything is broken.
+
+- **No `@ironoaksbbq.com` mailboxes exist** — confirmed in cPanel → Email
+  Accounts ("0 Used"; the only row is the `ruejeste` System account). The MX,
+  SPF, DKIM and DMARC records are HostGator's unused defaults. Left in place
+  regardless, since nothing is gained by removing them.
+- **There is no Cloudflare plugin in this cPanel** — searching "cloudflare"
+  returns nothing, so any CDN layer lives in the HostGator customer portal.
 - **No secret keys are needed from Edward.** Audited every env var the app
   reads: Upstash Redis (ours, already live), `STRIPE_SECRET_KEY` /
   `STRIPE_WEBHOOK_SECRET` (orphaned, nothing calls them), `NEXT_PUBLIC_BASE_URL`
   (only Stripe redirects used it). Heartland needs no key — it's a plain public
   URL the site links to.
-- **The one open question for Edward:** does he use any address ending
-  `@ironoaksbbq.com`? The domain has an MX record (`mail.ironoaksbbq.com`), but
-  his business email is Gmail, so it's probably HostGator's unused default. If a
-  mailbox *is* in use, switching nameservers to Vercel kills mail silently.
-- **Safe path either way:** leave nameservers at HostGator, add only the A +
-  CNAME records Vercel shows when the domain is added. MX stays put. Switching
-  nameservers wholesale is simpler but only safe if no domain email exists.
-- Don't take his HostGator password — he adds the records, or adds a delegated
-  cPanel user.
 
-### Before the domain goes live
+### Before the domain finishes going live
 
-- [ ] `/api/state` still has **no authentication** (see below) — a real domain is
-      far more discoverable than `*.vercel.app`.
-- [ ] The dashboard **prints its own password** on the login screen
-      (`dashboard/page.tsx:120` renders "Demo password: ironoaks").
+- [x] **`/api/state` is locked** — server-side password check, deployed and
+      verified in production *(2026-08-14)*
+- [x] **The dashboard no longer prints its password** *(2026-08-14)*
 - [ ] Placeholder contact details render in the footer sitewide: phone
       `(512) 555-0123` (reserved fake range) and Instagram `@ironoaks`
-      (unconfirmed). `ordersEmail` / `cateringEmail` are fake but render nowhere.
+      (unconfirmed). **Needs Edward's real phone and Instagram, or both come
+      out.** `ordersEmail` / `cateringEmail` are fake but render nowhere.
 - [ ] Seven community partners still show "Description coming soon".
 
 ## To do
 
-- [ ] **🔒 Lock down `/api/state`** — the dashboard password is checked in the
-      browser only (`dashboard/page.tsx:110`); it decides what to *show*, and
-      guards nothing. The POST route that actually saves (`src/app/api/state/route.ts:10`)
-      accepts any request, no password. Anyone who finds the address can change
-      the truck's hours, mark it sold out mid-service, or write fake catering
-      dates onto the public calendar. Verified locally by POSTing with `curl` and
-      no credentials; production runs the same code. Fix: a shared secret in a
-      Vercel env var that the POST must present, checked server-side. ~20 min.
-      *Raised and deferred 2026-08-05 — do before a custom domain makes the site
-      easier to find.*
+- [x] **🔒 `/api/state` is locked down** — the password used to be compared in
+      the browser, where it only decided what to render; the POST route that
+      actually saves took any request with no credential at all. Now the
+      password lives in the `DASHBOARD_PASSWORD` env var and is checked
+      server-side (`src/lib/auth.ts`, `src/app/api/auth/route.ts`). A successful
+      login sets an httpOnly cookie holding a hash, never the password, so the
+      page can't read it back; `GET` stays public because the site renders from
+      it. **Fails closed** — with `DASHBOARD_PASSWORD` unset in production every
+      write is refused rather than falling back to the `ironoaks` value that is
+      still in this repo's history. Dev keeps that fallback so `npm run dev`
+      works with no `.env.local`. Verified in production: unauthenticated POST
+      → 401, old password → 401, public GET → 200 *(2026-08-14)*
+
+> **⚠️ `DASHBOARD_PASSWORD` must stay set in Vercel** (Settings → Environments →
+> Production → Environment Variables). If it is ever removed, Edward's dashboard
+> stops saving — by design. It is not in `.env.local.example`, because that file
+> is gitignored and untracked in this repo.
 - [ ] **Email Heartland's rep/dealer about prefilled carts** — ask specifically
       whether Online Ordering (`*.hrpos.heartland.us`) can accept an order
       handed over from an external site: URL parameters, a deep link, or the
