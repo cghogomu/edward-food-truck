@@ -88,6 +88,63 @@ Repo: https://github.com/cghogomu/edward-food-truck (`master` → auto-deploys t
       Edward was sent was a Gmail `google.com/url?q=` wrapper; stripped it so
       customers go straight to Heartland *(2026-08-05)*
 
+## 📍 Where we left off — 2026-08-14
+
+**Local is 3 commits ahead of production.** Nothing since 2026-08-05 is deployed.
+
+| | |
+|---|---|
+| Local `master` | `0e588a8` — working tree clean |
+| Production | `5cd45a7` — still shows the old menu, pickup address, single service window, stock truck photo, promo bar |
+
+Unpushed: `035881e` (lunch/evening + menu matched to Heartland), `3f196c4`
+(per-potato stock), `0e588a8` (home page rework + gold-text clipping fix).
+
+**Deploying is one command — `git push origin master`.** Vercel auto-builds.
+The one thing to watch is the first production read: it migrates the live Redis
+state through both schema hops at once (single `hours`/`inventory` → lunch +
+evening windows → per-potato stock). Both hops were tested locally against real
+state; existing hours land in Lunch untouched, Evening arrives switched off, and
+the portion total splits across the potatoes without changing the number.
+
+Restart the dev server with `npm run dev` (serves the site and the dashboard —
+`/dashboard`, password `ironoaks`).
+
+### 🌐 Custom domain — ironoaksbbq.com (in progress)
+
+Domain is registered and **already pointing at HostGator** (nameservers
+`hgns1`/`hgns2.hostgator.com`, A record `129.121.64.244`). Nothing real is
+served there — the HTTPS cert is HostGator's parked-domain default
+(`rue.jes.temporary.site`).
+
+- **Edward owns the HostGator account**; its contact address is
+  `ironoaksllc@gmail.com`.
+- **No secret keys are needed from Edward.** Audited every env var the app
+  reads: Upstash Redis (ours, already live), `STRIPE_SECRET_KEY` /
+  `STRIPE_WEBHOOK_SECRET` (orphaned, nothing calls them), `NEXT_PUBLIC_BASE_URL`
+  (only Stripe redirects used it). Heartland needs no key — it's a plain public
+  URL the site links to.
+- **The one open question for Edward:** does he use any address ending
+  `@ironoaksbbq.com`? The domain has an MX record (`mail.ironoaksbbq.com`), but
+  his business email is Gmail, so it's probably HostGator's unused default. If a
+  mailbox *is* in use, switching nameservers to Vercel kills mail silently.
+- **Safe path either way:** leave nameservers at HostGator, add only the A +
+  CNAME records Vercel shows when the domain is added. MX stays put. Switching
+  nameservers wholesale is simpler but only safe if no domain email exists.
+- Don't take his HostGator password — he adds the records, or adds a delegated
+  cPanel user.
+
+### Before the domain goes live
+
+- [ ] `/api/state` still has **no authentication** (see below) — a real domain is
+      far more discoverable than `*.vercel.app`.
+- [ ] The dashboard **prints its own password** on the login screen
+      (`dashboard/page.tsx:120` renders "Demo password: ironoaks").
+- [ ] Placeholder contact details render in the footer sitewide: phone
+      `(512) 555-0123` (reserved fake range) and Instagram `@ironoaks`
+      (unconfirmed). `ordersEmail` / `cateringEmail` are fake but render nowhere.
+- [ ] Seven community partners still show "Description coming soon".
+
 ## To do
 
 - [ ] **🔒 Lock down `/api/state`** — the dashboard password is checked in the
