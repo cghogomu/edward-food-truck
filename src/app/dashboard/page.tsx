@@ -5,16 +5,18 @@ import { useRouter } from "next/navigation";
 import type { SiteState, ServicePeriod, ItemStock, CalendarEntry } from "@/types";
 import { MAIN_ITEMS } from "@/content/menu";
 
-const PASS_KEY = "iron-oaks-dashboard-auth";
-const DEMO_PASSWORD = "ironoaks";
-
 export default function DashboardPage() {
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [state, setState] = useState<SiteState | null>(null);
   const router = useRouter();
 
+  // The server owns the answer now — the session lives in an httpOnly cookie
+  // the page can't read, so we have to ask.
   useEffect(() => {
-    setAuthed(sessionStorage.getItem(PASS_KEY) === "ok");
+    fetch("/api/auth", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d: { authed: boolean }) => setAuthed(d.authed))
+      .catch(() => setAuthed(false));
   }, []);
 
   useEffect(() => {
@@ -30,6 +32,14 @@ export default function DashboardPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(p),
     });
+
+    // A 12-hour session can lapse mid-edit; drop back to the login gate rather
+    // than showing changes the server refused to save.
+    if (res.status === 401) {
+      setAuthed(false);
+      return;
+    }
+
     const next = (await res.json()) as SiteState;
     setState(next);
     router.refresh();
@@ -59,9 +69,10 @@ export default function DashboardPage() {
           </h1>
         </div>
         <button
-          onClick={() => {
-            sessionStorage.removeItem(PASS_KEY);
+          onClick={async () => {
+            await fetch("/api/auth", { method: "DELETE" });
             setAuthed(false);
+            setState(null);
           }}
           className="text-xs text-(--text-muted) hover:text-(--text)"
         >
@@ -106,49 +117,65 @@ export default function DashboardPage() {
 
 function LoginGate({ onSuccess }: { onSuccess: () => void }) {
   const [pw, setPw] = useState("");
-  const [err, setErr] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  // The password is never in this bundle — it's checked on the server, so a
+  // wrong guess costs a round trip instead of being decided in the browser.
+  async function signIn(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    try {
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: pw }),
+      });
+      if (res.ok) {
+        onSuccess();
+        return;
+      }
+      const body = (await res.json().catch(() => ({}))) as { error?: string };
+      setErr(body.error ?? "Wrong password.");
+    } catch {
+      setErr("Couldn't reach the server. Check your connection.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <div className="max-w-sm mx-auto px-5 py-20">
       <p className="text-(--amber) text-xs uppercase tracking-[0.18em] font-semibold mb-3 text-center">
         Iron Oaks · Truck Dashboard
       </p>
-      <h1 className="font-serif text-3xl text-(--text) text-center mb-2">
+      <h1 className="font-serif text-3xl text-(--text) text-center mb-8">
         Sign in.
       </h1>
-      <p className="text-(--text-soft) text-sm text-center mb-8">
-        Demo password: <code className="text-(--amber)">{DEMO_PASSWORD}</code>
-      </p>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (pw === DEMO_PASSWORD) {
-            sessionStorage.setItem(PASS_KEY, "ok");
-            onSuccess();
-          } else {
-            setErr(true);
-          }
-        }}
-        className="space-y-3"
-      >
+      <form onSubmit={signIn} className="space-y-3">
         <input
           type="password"
           value={pw}
           onChange={(e) => {
             setPw(e.target.value);
-            setErr(false);
+            setErr(null);
           }}
           placeholder="Password"
+          autoComplete="current-password"
           className={`w-full bg-(--bg-card) border rounded-lg px-4 py-3 text-(--text) placeholder:text-(--text-muted) focus:border-(--amber) outline-hidden ${
             err ? "border-(--closed)" : "border-(--color-line)"
           }`}
         />
         <button
           type="submit"
-          className="w-full bg-(--russet) hover:bg-(--russet-deep) text-(--text) py-3 rounded-lg text-sm font-semibold uppercase tracking-wide"
+          disabled={busy || pw.length === 0}
+          className="w-full bg-(--russet) hover:bg-(--russet-deep) disabled:opacity-50 text-(--text) py-3 rounded-lg text-sm font-semibold uppercase tracking-wide"
         >
-          Sign in
+          {busy ? "Checking…" : "Sign in"}
         </button>
+        {err && (
+          <p className="text-(--closed) text-xs text-center pt-1">{err}</p>
+        )}
       </form>
     </div>
   );
