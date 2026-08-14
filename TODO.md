@@ -152,7 +152,31 @@ resolvers before concluding anything is broken.
       is one place to change it. Edward may swap in a separate work line later.
       `ordersEmail` / `cateringEmail` are still placeholders but render nowhere
       *(2026-08-14)*
-- [ ] Seven community partners still show "Description coming soon".
+- [x] **Community partners written up** — no card says "Description coming
+      soon" any more. Tony's Mobile Repair removed (out of contact with Edward);
+      "Matt's Lifted Lemonades" renamed to **LYFTD Lounge** with its `@lyftdllc`
+      handle. Blurbs for Fraga Barbershop, Dutch Bros and Botanic Bliss are
+      written from what each business publishes about itself. Two names were
+      corrected to how they actually trade: "Fraga's Barbershop" → **Fraga
+      Barbershop**, "Botanic Bliss" → **Botanic Bliss Café & Lounge**
+      *(2026-08-14)*
+
+- [ ] **↩︎ Put Jimmy's Auto Repair back on the community page** — pulled
+      2026-08-14 rather than published with a guess. The listing said "Jimmy's
+      Auto Repair, Austin", but no shop by that exact name turns up. The two
+      candidates are **Jimmy's Top Tech Auto** (2216 S 1st St, family-run since
+      2000, open) and **Jimmy's Automotive** (Woodrow Ave, permanently closed) —
+      and it may be a third that doesn't surface in search, the way `@lyftdllc`
+      didn't. **Ask Edward which shop is his**, then re-add it to
+      `COMMUNITY_PARTNERS` in `src/content/spotlight.ts`.
+
+- [ ] **Describe LYFTD Lounge properly** — its Instagram profile is
+      age-restricted, so the bio can't be read without logging in, and the
+      current blurb ("Cold drinks for hot plates…") deliberately points at their
+      feed instead of describing a menu nobody has seen. One sentence from
+      Edward about what they sell replaces it. Worth noting the age gate usually
+      means alcohol — if so, featuring them is a call Edward should make on
+      purpose rather than inherit from the old "Matt's Lifted Lemonades" entry.
 
 ### ⏳ The only thing still in flight — read this first on Monday
 

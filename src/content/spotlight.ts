@@ -4,6 +4,8 @@ export type SpotlightPartner = {
   blurb: string;
   location?: string;
   url?: string;
+  /** Handle with the leading "@" — the card links it to the profile. */
+  instagram?: string;
   placeholder?: boolean;
 };
 
@@ -14,49 +16,46 @@ export const HOST_BUSINESS = {
   url: "https://conspecs.com/",
 };
 
-// Description placeholder shared until Edward writes each one up.
-const PARTNER_BLURB_TODO = "Description coming soon";
-
+// Blurbs are written from what each business publishes about itself, so the
+// site doesn't put words in a neighbour's mouth. A partner we can't describe
+// accurately gets left off the page rather than given a plausible-sounding
+// invention — see Jimmy's in TODO.md.
 export const COMMUNITY_PARTNERS: SpotlightPartner[] = [
   {
-    name: "Fraga's Barbershop",
+    // Trades as "Fraga Barbershop" — no apostrophe-s — everywhere it lists itself.
+    name: "Fraga Barbershop",
     category: "Barber",
-    location: "Pflugerville",
-    blurb: PARTNER_BLURB_TODO,
-    placeholder: true,
+    location: "W Pecan St, Pflugerville",
+    blurb:
+      "A straight-edge shop on Pecan — fades, line-ups and hot-towel shaves, done the unhurried way. Walk in if they're quiet; book ahead if you'd rather not gamble on a Saturday.",
+    instagram: "@fraga_barbershop",
   },
   {
     name: "Dutch Bros",
     category: "Coffee",
-    location: "Parmer Ln & Wells Branch",
-    blurb: PARTNER_BLURB_TODO,
-    placeholder: true,
+    location: "E Parmer Ln, Austin",
+    blurb:
+      "Doors open at five, which matters when you've been up since four cooking. Coffee, teas, energy drinks and the blended stuff, and a crew that moves the drive-thru line faster than it looks.",
   },
   {
-    name: "Botanic Bliss",
+    name: "Botanic Bliss Café & Lounge",
     category: "Cafe",
-    location: "Pflugerville",
-    blurb: PARTNER_BLURB_TODO,
-    placeholder: true,
+    location: "FM 685, Pflugerville",
+    blurb:
+      "A wellness café on 685 — specialty coffee, matcha, smoothies, bowls and wraps in a room built to slow you down. The lighter counterweight to a fully loaded potato, and good people besides.",
+    url: "https://thebotanicbliss.org/",
+    instagram: "@botanicblissorg",
   },
   {
-    name: "Jimmy's Auto Repair",
-    category: "Auto Repair",
-    location: "Austin",
-    blurb: PARTNER_BLURB_TODO,
-    placeholder: true,
-  },
-  {
-    name: "Tony's Mobile Repair",
-    category: "Mobile Mechanic",
-    blurb: PARTNER_BLURB_TODO,
-    placeholder: true,
-  },
-  {
-    name: "Matt's Lifted Lemonades",
+    // Handle confirmed by Edward. The profile is age-restricted on Instagram,
+    // so its bio can't be read without logging in — hence a blurb that points
+    // at their feed instead of describing a menu we haven't seen. Swap in a
+    // real description once someone asks them what they're pouring.
+    name: "LYFTD Lounge",
     category: "Drinks",
-    blurb: PARTNER_BLURB_TODO,
-    placeholder: true,
+    blurb:
+      "Cold drinks for hot plates. Their Instagram has what's pouring and where they'll be.",
+    instagram: "@lyftdllc",
   },
 ];
 

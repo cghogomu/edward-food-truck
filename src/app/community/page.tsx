@@ -83,6 +83,16 @@ export default function CommunityPage() {
               <p className="text-(--text-soft) text-sm leading-relaxed">
                 {partner.blurb}
               </p>
+              {partner.instagram && (
+                <a
+                  href={`https://instagram.com/${partner.instagram.replace(/^@/, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-3 text-xs text-(--text-muted) hover:text-(--amber) transition-colors"
+                >
+                  {partner.instagram}
+                </a>
+              )}
             </div>
           ))}
         </div>
