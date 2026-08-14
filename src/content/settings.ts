@@ -20,10 +20,14 @@ export const SETTINGS = {
   //   },
   // The delivery-zone map also has a commented-out truck pin to re-enable.
   contact: {
-    phone: "(512) 555-0123",
+    // Edward's real number, confirmed 2026-08-14. He may swap this for a
+    // separate work line later.
+    phone: "(512) 945-6117",
     ordersEmail: "orders@ironoaks.placeholder",
     cateringEmail: "edward@ironoaks.placeholder",
-    instagram: "@ironoaks",
+    // Confirmed 2026-08-14. The footer had "@ironoaks" — a guess nobody had
+    // verified, which would have pointed customers at a stranger's account.
+    instagram: "@ironoaksatx",
   },
   ordering: {
     deliveryFee: 0,

@@ -45,8 +45,26 @@ export function SiteFooter({ orderable }: { orderable: boolean }) {
             Reach us
           </div>
           <ul className="space-y-2 text-sm">
-            <li className="text-(--text-soft)">{SETTINGS.contact.phone}</li>
-            <li className="text-(--text-soft)">{SETTINGS.contact.instagram}</li>
+            <li>
+              <a
+                href={`tel:${SETTINGS.contact.phone.replace(/[^0-9+]/g, "")}`}
+                className="text-(--text-soft) hover:text-(--text)"
+              >
+                {SETTINGS.contact.phone}
+              </a>
+            </li>
+            {SETTINGS.contact.instagram && (
+              <li>
+                <a
+                  href={`https://instagram.com/${SETTINGS.contact.instagram.replace(/^@/, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-(--text-soft) hover:text-(--text)"
+                >
+                  {SETTINGS.contact.instagram}
+                </a>
+              </li>
+            )}
             <li>
               <Link
                 href="/catering"

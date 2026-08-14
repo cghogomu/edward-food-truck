@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { SETTINGS } from "@/content/settings";
 
 type LastOrder = {
   orderNumber: string;
@@ -125,7 +126,8 @@ function SuccessShell({ order }: { order: LastOrder | null }) {
       )}
 
       <p className="mt-10 text-(--text-muted) text-sm">
-        Confirmation email on the way. Questions? Reach Edward at (512) 555-0123.
+        Confirmation email on the way. Questions? Reach Edward at{" "}
+        {SETTINGS.contact.phone}.
       </p>
 
       <div className="mt-8">
