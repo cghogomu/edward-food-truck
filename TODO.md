@@ -178,7 +178,22 @@ resolvers before concluding anything is broken.
       means alcohol — if so, featuring them is a call Edward should make on
       purpose rather than inherit from the old "Matt's Lifted Lemonades" entry.
 
-### ⏳ The only thing still in flight — read this first on Monday
+### ✅ The domain is live — 2026-08-17
+
+`https://ironoaksbbq.com` and `https://www.ironoaksbbq.com` both serve the site
+over HTTPS, with a Let's Encrypt certificate Vercel issued on its own. All four
+public resolvers checked return `216.198.79.1`. Verified on the real domain:
+the page title is right, the footer carries the real phone and Instagram, the
+community page shows the rewritten partners, and an unauthenticated
+`POST /api/state` returns 401.
+
+Note: `www` currently **serves** the site rather than redirecting to the apex,
+so both addresses return 200 for the same content. Harmless, but a redirect
+would be tidier for search engines — Vercel → Settings → Domains → Edit on the
+`www` entry → redirect to `ironoaksbbq.com`.
+
+<details>
+<summary>What this looked like while it was propagating (kept for next time)</summary>
 
 **Nothing is blocked on a person.** The site, the lock and the real contact
 details are all deployed and verified. What's left finishes by itself:
@@ -196,6 +211,8 @@ details are all deployed and verified. What's left finishes by itself:
 **Monday check, ~30 seconds:** open `https://ironoaksbbq.com`. If the site loads
 with a padlock, it's done. If not, the Vercel domain row will say what it's
 waiting on, and `dig +short A ironoaksbbq.com` should return `216.198.79.1`.
+
+</details>
 
 ## To do
 

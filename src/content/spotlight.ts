@@ -47,6 +47,16 @@ export const COMMUNITY_PARTNERS: SpotlightPartner[] = [
     instagram: "@botanicblissorg",
   },
   {
+    // The shop that built this site. Listed here at Edward's request — the
+    // footer credit links here too, via SETTINGS.site.builderUrl.
+    name: "Meridian Works",
+    category: "Web Design",
+    location: "Austin",
+    blurb:
+      "They built this site — the menu you just read, the map, the whole thing. An Austin shop that works with small businesses across Texas: food trucks, barbershops, contractors, anyone trying to get found and get chosen.",
+    url: "https://www.meridianworksco.com",
+  },
+  {
     // Handle confirmed by Edward. The profile is age-restricted on Instagram,
     // so its bio can't be read without logging in — hence a blurb that points
     // at their feed instead of describing a menu we haven't seen. Swap in a
