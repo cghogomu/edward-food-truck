@@ -19,6 +19,15 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
+  // The site also answers on edward-food-truck.vercel.app, which Vercel won't
+  // let us delete. Without a canonical, that's a second indexable copy of every
+  // page and search engines split the ranking between them. "./" resolves
+  // against the current route, so each page names its own real address rather
+  // than every page claiming to be the homepage — verify that if this moves.
+  metadataBase: new URL("https://ironoaksbbq.com"),
+  alternates: {
+    canonical: "./",
+  },
   title: "Iron Oaks — Loaded Potatoes · Austin",
   description:
     "Upscale quality, for blue collar pockets. Loaded potatoes made one at a time in Austin, Texas.",
