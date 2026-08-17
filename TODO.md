@@ -218,6 +218,30 @@ waiting on, and `dig +short A ironoaksbbq.com` should return `216.198.79.1`.
 
 </details>
 
+### 🔎 The vercel.app URL (resolved 2026-08-17)
+
+`edward-food-truck.vercel.app` **cannot be deleted** — Vercel assigns every
+project a permanent `*.vercel.app` address, and renaming the project only
+changes which one. It was serving a second fully indexable copy of the site:
+no canonical tag, no `noindex`, no `robots.txt` (404 on both hosts).
+
+Fixed in code rather than by redirecting it, deliberately. The host still
+serves, because the domain's DNS lives at **HostGator** — a third party whose
+login texts codes to Edward — and if that breaks, the `vercel.app` URL is the
+only remaining way into the site *and its dashboard*. A redirect would bounce
+us to the broken domain exactly when we need the way in.
+
+- `next.config.ts` sets `X-Robots-Tag: noindex, nofollow`, matched on the
+  `vercel.app` host only, so the real domain still indexes normally.
+- `src/app/layout.tsx` sets `metadataBase` + `alternates.canonical: "./"`, so
+  every page names its own `ironoaksbbq.com` address — including the pages
+  served from the `vercel.app` host, which is what consolidates the ranking.
+
+⚠️ If the canonical config ever moves out of the root layout, **re-check it per
+route**. `"./"` resolves against the current path; get it wrong and every page
+claims to be the homepage, which is worse than having no canonical at all.
+Verified across `/`, `/menu`, `/community`, `/order`, `/catering`.
+
 ## To do
 
 - [x] **🔒 `/api/state` is locked down** — the password used to be compared in
