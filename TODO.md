@@ -187,10 +187,14 @@ the page title is right, the footer carries the real phone and Instagram, the
 community page shows the rewritten partners, and an unauthenticated
 `POST /api/state` returns 401.
 
-Note: `www` currently **serves** the site rather than redirecting to the apex,
-so both addresses return 200 for the same content. Harmless, but a redirect
-would be tidier for search engines — Vercel → Settings → Domains → Edit on the
-`www` entry → redirect to `ironoaksbbq.com`.
+`www` **308-redirects to the apex**, set in Vercel → Settings → Domains → Edit
+on the `www` row. Both addresses used to serve the same content at 200, which
+splits search ranking across two URLs. 308 rather than 301 because it preserves
+the request method: the dashboard saves by POST, and a 301 can downgrade a POST
+to a GET, so a bookmark on the `www` host could have failed to save in a way
+that would be miserable to diagnose. Verified: `www` → 308 →
+`https://ironoaksbbq.com/`, paths survive the hop (`www/community` →
+`/community`), the apex still answers 200 directly, and there is no loop.
 
 <details>
 <summary>What this looked like while it was propagating (kept for next time)</summary>
