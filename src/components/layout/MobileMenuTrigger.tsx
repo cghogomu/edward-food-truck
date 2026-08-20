@@ -17,11 +17,9 @@ const LINKS = [
 ] as const;
 
 export function MobileMenuTrigger({
-  orderable,
-  reason,
+  note,
 }: {
-  orderable: boolean;
-  reason?: string;
+  note?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -119,15 +117,11 @@ export function MobileMenuTrigger({
         </ul>
 
         <div className="mt-10 px-2">
-          <OrderLink
-            disabled={!orderable}
-            disabledReason={reason}
-            className="block w-full text-center bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-5 py-4 rounded-lg text-sm font-semibold uppercase tracking-wide"
-          >
-            {orderable ? "Order now" : "Ordering closed"}
+          <OrderLink className="block w-full text-center bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-5 py-4 rounded-lg text-sm font-semibold uppercase tracking-wide">
+            Order now
           </OrderLink>
           <p className="mt-2.5 text-center text-[11px] text-(--text-muted)">
-            {orderable ? "Opens Heartland in a new tab" : reason ?? "Back at our next service"}
+            {note ?? "Opens in a new tab"}
           </p>
         </div>
       </nav>

@@ -1,14 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MENU, formatPrice } from "@/content/menu";
-import { getSiteState, deriveOpenStatus, isOrderable } from "@/lib/state";
+import { getSiteState, deriveOpenStatus, orderNote, isServingNow } from "@/lib/state";
 import { OpenStatusPill } from "@/components/OpenStatusPill";
 import { OrderLink } from "@/components/OrderLink";
 
 export default async function MenuPage() {
   const state = await getSiteState();
   const status = deriveOpenStatus(state);
-  const orderable = isOrderable(status);
+  const serving = isServingNow(status);
+  const note = orderNote(status);
 
   const cards = MENU.filter((item) => item.category !== "extra");
   const extras = MENU.filter((item) => item.category === "extra");
@@ -28,7 +29,7 @@ export default async function MenuPage() {
         <OpenStatusPill status={status} />
       </header>
 
-      <OrderCallout status={status.state} detail={status.detail} orderable={orderable} />
+      <OrderCallout status={status.state} detail={status.detail} serving={serving} />
 
       <div className="space-y-12 sm:space-y-16">
         {cards.map((item) => (
@@ -136,22 +137,18 @@ export default async function MenuPage() {
       {/* Second CTA — the first one is 3+ screens up by the time you've read the menu. */}
       <div className="mt-14 bg-(--bg-card) border border-(--color-line) rounded-2xl p-7 sm:p-9 text-center">
         <h2 className="font-serif text-2xl sm:text-3xl text-(--text) mb-2">
-          {orderable ? "Ready to eat?" : "We're closed right now."}
+          {serving ? "Ready to eat?" : "Order ahead."}
         </h2>
         <p className="text-(--text-soft) text-sm mb-6 max-w-md mx-auto">
-          {orderable
-            ? "Ordering and payment happen on our Heartland page — pick your potato, customize it, and pay there."
-            : status.detail ?? "Check back at our next service."}
+          {serving
+            ? "Pick your potato, customize it, and pay — all in one place."
+            : `${status.detail ?? "We're not serving right now."} You can still order ahead — put it in now and we'll make it next service.`}
         </p>
-        <OrderLink
-          disabled={!orderable}
-          disabledReason={status.detail}
-          className="inline-block bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-8 py-4 rounded-lg text-sm font-semibold uppercase tracking-wide transition-colors"
-        >
-          {orderable ? "Order on Heartland ↗" : "Ordering closed"}
+        <OrderLink className="inline-block bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-8 py-4 rounded-lg text-sm font-semibold uppercase tracking-wide transition-colors">
+          {serving ? "Order now ↗" : "Order ahead ↗"}
         </OrderLink>
         <p className="mt-4 text-xs text-(--text-muted)">
-          {orderable ? "Opens in a new tab" : "Ordering reopens with the truck"} ·{" "}
+          {note} ·{" "}
           <Link href="/order" className="text-(--amber) hover:text-(--text)">
             Delivery zone &amp; hours
           </Link>
@@ -173,45 +170,42 @@ export default async function MenuPage() {
   );
 }
 
+/**
+ * Always carries the order button. It used to drop the button entirely when the
+ * truck was shut, which is how customers ended up unable to order ahead for a
+ * service they knew was coming. The status is still stated plainly — it just
+ * sits next to a working button instead of replacing it.
+ */
 function OrderCallout({
   status,
   detail,
-  orderable,
+  serving,
 }: {
   status: string;
   detail?: string;
-  orderable: boolean;
+  serving: boolean;
 }) {
-  if (orderable) {
-    return (
-      <div className="mb-10 flex flex-wrap items-center justify-between gap-4 bg-(--bg-card) border border-(--color-line) rounded-2xl p-5 sm:p-6">
-        <div className="min-w-0">
-          <div className="font-medium text-(--text)">Order online</div>
-          <p className="text-(--text-soft) text-sm mt-0.5">
-            Browse here, then order and pay on our Heartland page.
-          </p>
-        </div>
-        <OrderLink className="shrink-0 bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-6 py-3 rounded-lg text-sm font-semibold uppercase tracking-wide transition-colors">
-          Order now ↗
-        </OrderLink>
-      </div>
-    );
-  }
+  const heading = serving
+    ? "Order online"
+    : status === "sold-out"
+      ? "Sold out for today."
+      : status === "catering"
+        ? "We're catering today."
+        : "We're closed right now.";
 
   return (
-    <div className="mb-10 bg-(--bg-card) border border-(--color-line) rounded-2xl p-5 sm:p-6">
-      <div className="text-sm">
-        <strong className="text-(--text)">
-          {status === "sold-out" ? "Sold out for today." : "We're closed right now."}
-        </strong>
-        {detail && <span className="text-(--text-soft)"> {detail}</span>}
+    <div className="mb-10 flex flex-wrap items-center justify-between gap-4 bg-(--bg-card) border border-(--color-line) rounded-2xl p-5 sm:p-6">
+      <div className="min-w-0">
+        <div className="font-medium text-(--text)">{heading}</div>
+        <p className="text-(--text-soft) text-sm mt-0.5">
+          {serving
+            ? "Browse here, then order and pay online."
+            : `${detail ? detail + " " : ""}You can still order ahead — put it in now, we'll make it next service.`}
+        </p>
       </div>
-      <p className="text-(--text-soft) text-sm mt-2">
-        The full menu is below.{" "}
-        <span className="text-(--text-muted) font-medium">
-          Ordering reopens with the truck.
-        </span>
-      </p>
+      <OrderLink className="shrink-0 bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-6 py-3 rounded-lg text-sm font-semibold uppercase tracking-wide transition-colors">
+        {serving ? "Order now ↗" : "Order ahead ↗"}
+      </OrderLink>
     </div>
   );
 }

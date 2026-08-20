@@ -277,11 +277,33 @@ function stockFor(p: ServicePeriod) {
 }
 
 /**
- * Whether the truck can take an order right now. Every "Order on Heartland"
- * CTA is gated on this — sending someone to checkout while the truck is closed,
- * sold out, or off catering just produces an order nobody can fill.
+ * The line printed under an "Order on Heartland" CTA.
+ *
+ * Ordering is deliberately never gated on the truck being open. Heartland takes
+ * orders whether or not anyone is at the window, and customers schedule
+ * delivery for later in the day — they were hitting a dead end trying to order
+ * ahead for hours they knew the truck would be running. The open/closed badge
+ * still shows; it tells the truth about timing instead of blocking the sale.
+ *
+ * If orders ever genuinely need to stop, that is Heartland's switch to throw,
+ * not this site's: Heartland owns the cart and knows what it can fill.
  */
-export function isOrderable(status: OpenStatus): boolean {
+export function orderNote(status: OpenStatus): string {
+  switch (status.state) {
+    case "open":
+    case "low":
+      return "Opens in a new tab";
+    case "sold-out":
+      return "Today's batch is gone — order ahead for our next service";
+    case "catering":
+      return "We're catering today — order ahead for our next service";
+    default:
+      return "Closed right now — order ahead for our next service";
+  }
+}
+
+/** True only when the truck is actually serving — for copy, never for gating. */
+export function isServingNow(status: OpenStatus): boolean {
   return status.state === "open" || status.state === "low";
 }
 

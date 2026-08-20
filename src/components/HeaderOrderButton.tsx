@@ -1,20 +1,13 @@
 import { OrderLink } from "@/components/OrderLink";
 
-export function HeaderOrderButton({
-  orderable,
-  reason,
-}: {
-  orderable: boolean;
-  reason?: string;
-}) {
+export function HeaderOrderButton() {
+  // Always live. The open/closed state is already shown by the status pill
+  // sitting next to this button, so it doesn't need saying twice — and saying
+  // it here used to stop people ordering ahead.
   return (
-    <OrderLink
-      disabled={!orderable}
-      disabledReason={reason}
-      className="hidden md:inline-flex items-center gap-1.5 bg-(--russet) hover:bg-(--russet-deep) text-(--text) text-sm font-medium px-4 py-2 rounded transition-colors"
-    >
-      {orderable ? "Order" : "Closed"}
-      {orderable && <ExternalIcon />}
+    <OrderLink className="hidden md:inline-flex items-center gap-1.5 bg-(--russet) hover:bg-(--russet-deep) text-(--text) text-sm font-medium px-4 py-2 rounded transition-colors">
+      Order
+      <ExternalIcon />
     </OrderLink>
   );
 }

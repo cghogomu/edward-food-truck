@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SETTINGS } from "@/content/settings";
 import { OrderLink } from "@/components/OrderLink";
 
-export function SiteFooter({ orderable }: { orderable: boolean }) {
+export function SiteFooter() {
   return (
     <footer className="pt-20" style={{ background: "rgba(5,7,6,0.65)" }}>
       <div className="max-w-6xl mx-auto px-5 sm:px-8 py-14 grid gap-10 md:grid-cols-4">
@@ -26,11 +26,8 @@ export function SiteFooter({ orderable }: { orderable: boolean }) {
             <li><Link href="/menu" className="text-(--text-soft) hover:text-(--text)">Menu</Link></li>
             <li><Link href="/order" className="text-(--text-soft) hover:text-(--text)">How to order</Link></li>
             <li>
-              <OrderLink
-                disabled={!orderable}
-                className="text-(--amber) hover:text-(--text)"
-              >
-                Order on Heartland ↗
+              <OrderLink className="text-(--amber) hover:text-(--text)">
+                Order online ↗
               </OrderLink>
             </li>
             <li><Link href="/calendar" className="text-(--text-soft) hover:text-(--text)">Calendar</Link></li>

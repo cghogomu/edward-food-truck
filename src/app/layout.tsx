@@ -4,7 +4,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
-import { getSiteState, deriveOpenStatus, isOrderable } from "@/lib/state";
+import { getSiteState, deriveOpenStatus, orderNote } from "@/lib/state";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -42,10 +42,9 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const state = await getSiteState();
-  // One source of truth for whether any "Order" CTA is live, so the header,
-  // footer and mobile nav can never disagree with the status badge.
+  // Ordering is always reachable; the status only decides the wording beside
+  // it, so the header, footer and mobile nav all say the same thing.
   const status = deriveOpenStatus(state);
-  const orderable = isOrderable(status);
 
   return (
     <html
@@ -55,8 +54,8 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <SiteHeader state={state} />
         <main className="flex-1">{children}</main>
-        <SiteFooter orderable={orderable} />
-        <MobileBottomNav orderable={orderable} reason={status.detail} />
+        <SiteFooter />
+        <MobileBottomNav note={orderNote(status)} />
       </body>
     </html>
   );

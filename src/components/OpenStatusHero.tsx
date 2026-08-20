@@ -18,7 +18,10 @@ const STATE_LABEL_TINT: Record<OpenStatus["state"], string> = {
 };
 
 export function OpenStatusHero({ status }: { status: OpenStatus }) {
-  const showOrder = status.state === "open" || status.state === "low";
+  // The order button shows in every state. It used to appear only while the
+  // truck was serving, so the home page announced "Closed today" with no way to
+  // order ahead for the next service — the dead end customers complained about.
+  const serving = status.state === "open" || status.state === "low";
   const pct =
     status.remaining !== undefined && status.max
       ? Math.max(0, Math.min(100, Math.round((status.remaining / status.max) * 100)))
@@ -53,15 +56,22 @@ export function OpenStatusHero({ status }: { status: OpenStatus }) {
           )}
         </div>
 
-        {showOrder && (
-          <div className="shrink-0">
-            <OrderLink className="block text-center bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-5 py-3 rounded-lg text-sm font-semibold tracking-wide uppercase transition-colors">
-              Order now
-            </OrderLink>
+        <div className="shrink-0">
+          <OrderLink className="block text-center bg-(--russet) hover:bg-(--russet-deep) text-(--text) px-5 py-3 rounded-lg text-sm font-semibold tracking-wide uppercase transition-colors">
+            {serving ? "Order now" : "Order ahead"}
+          </OrderLink>
 
-            {/* What's actually left, per potato — so nobody clicks through to
-                Heartland only to find the one they wanted is gone. */}
-            {status.stock && status.stock.length > 0 && (
+          {!serving && (
+            <p className="mt-2 max-w-[13rem] text-xs text-(--text-muted) leading-snug">
+              Put it in now — we&apos;ll make it next service.
+            </p>
+          )}
+
+          {/* What's actually left, per potato — so nobody clicks through to
+              Heartland only to find the one they wanted is gone. Only while
+              we're serving: yesterday's counts mean nothing to someone
+              ordering ahead. */}
+          {serving && status.stock && status.stock.length > 0 && (
               <ul className="mt-3 space-y-1.5 text-sm">
                 {status.stock.map((s) => {
                   const out = s.today <= 0;
@@ -87,10 +97,9 @@ export function OpenStatusHero({ status }: { status: OpenStatus }) {
                     </li>
                   );
                 })}
-              </ul>
-            )}
-          </div>
-        )}
+            </ul>
+          )}
+        </div>
       </div>
 
       {pct !== null && status.state !== "closed" && status.state !== "catering" && (

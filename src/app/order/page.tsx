@@ -3,7 +3,7 @@ import { SETTINGS } from "@/content/settings";
 import { DELIVERY_ZIPS } from "@/content/zips";
 import { OrderLink } from "@/components/OrderLink";
 import { OpenStatusPill } from "@/components/OpenStatusPill";
-import { getSiteState, deriveOpenStatus, isOrderable } from "@/lib/state";
+import { getSiteState, deriveOpenStatus, orderNote, isServingNow } from "@/lib/state";
 
 /**
  * "How to order" — the practical detail Heartland's storefront doesn't cover:
@@ -14,7 +14,8 @@ export default async function OrderPage() {
   const state = await getSiteState();
   const status = deriveOpenStatus(state);
   const zips = [...DELIVERY_ZIPS].sort();
-  const orderable = isOrderable(status);
+  const serving = isServingNow(status);
+  const note = orderNote(status);
 
   return (
     <div className="max-w-3xl mx-auto px-5 sm:px-8 py-10 sm:py-16">
@@ -33,18 +34,16 @@ export default async function OrderPage() {
 
       <div className="bg-(--bg-card) border border-(--color-line) rounded-2xl p-6 sm:p-8 mb-10">
         <p className="text-(--text-soft) leading-relaxed mb-6">
-          Orders and payment run through our Heartland page. Pick your items,
-          customize them, add your address, and pay — all in one place.
+          Pick your items, customize them, add your address, and pay — all in
+          one place.
+          {!serving &&
+            " You can order outside our hours too — put it in now and schedule it for our next service."}
         </p>
-        <OrderLink
-          disabled={!orderable}
-          disabledReason={status.detail}
-          className="block w-full text-center bg-(--russet) hover:bg-(--russet-deep) text-(--text) py-4 rounded-lg text-sm font-semibold tracking-wide uppercase transition-colors"
-        >
-          {orderable ? "Order on Heartland ↗" : "Ordering closed"}
+        <OrderLink className="block w-full text-center bg-(--russet) hover:bg-(--russet-deep) text-(--text) py-4 rounded-lg text-sm font-semibold tracking-wide uppercase transition-colors">
+          {serving ? "Order now ↗" : "Order ahead ↗"}
         </OrderLink>
         <p className="mt-3 text-xs text-(--text-muted) text-center">
-          {orderable ? "Opens in a new tab" : status.detail ?? "Back at our next service"} ·{" "}
+          {note} ·{" "}
           <Link href="/menu" className="text-(--amber) hover:text-(--text)">
             See the full menu first
           </Link>
@@ -101,7 +100,7 @@ export default async function OrderPage() {
             ))}
           </div>
           <p className="text-(--text-muted) text-xs mt-4">
-            Confirm your address is covered at checkout on Heartland.
+            Confirm your address is covered at checkout.
           </p>
         </div>
       </section>
