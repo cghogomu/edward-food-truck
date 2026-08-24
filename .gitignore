@@ -44,6 +44,12 @@ next-env.d.ts
 # Meridian Works deliverables — business docs, not part of the site
 Iron-Oaks-Care-Plan.html
 Iron-Oaks-Care-Plan.md
+Iron-Oaks-Launch-Report.html
+Iron-Oaks-Launch-Report.pdf
+
+# Claude Code's local tool-permission allowlist. Machine-local, and it grows
+# every session — it was tracked by accident.
+.claude/settings.local.json
 
 # Photo drop folders from Edward — the images that made the cut are already
 # committed under public/ (marquee, menu, about). These are the raw originals.
