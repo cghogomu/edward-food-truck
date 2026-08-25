@@ -67,16 +67,12 @@ export type LegacySiteState = {
 };
 
 export type OpenStatus = {
-  state: "open" | "low" | "sold-out" | "closed" | "catering";
+  state: "open" | "sold-out" | "closed" | "catering";
   label: string;
   detail?: string;
-  remaining?: number;
-  max?: number;
   cateringClient?: string;
   /** Which window this refers to, when one is running or coming up next. */
   periodLabel?: string;
-  /** Per-potato counts for that window, so customers can see what's left. */
-  stock?: Array<{ itemId: string; name: string; today: number; max: number }>;
 };
 
 export type MenuItem = {

@@ -2,7 +2,6 @@ import type { OpenStatus } from "@/types";
 
 const STATE_STYLES: Record<OpenStatus["state"], string> = {
   open: "bg-(--open)/15 text-(--open) border-(--open)/30",
-  low: "bg-(--amber)/15 text-(--amber) border-(--amber)/30",
   "sold-out": "bg-(--closed)/15 text-(--closed) border-(--closed)/30",
   closed: "bg-(--text-muted)/15 text-(--text-soft) border-(--text-muted)/30",
   catering: "bg-(--amber)/15 text-(--amber) border-(--amber)/30",
@@ -10,7 +9,6 @@ const STATE_STYLES: Record<OpenStatus["state"], string> = {
 
 const DOT_STYLES: Record<OpenStatus["state"], string> = {
   open: "bg-(--open)",
-  low: "bg-(--amber)",
   "sold-out": "bg-(--closed)",
   closed: "bg-(--text-muted)",
   catering: "bg-(--amber)",

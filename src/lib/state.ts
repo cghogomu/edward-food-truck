@@ -266,16 +266,6 @@ function isSoldOut(p: ServicePeriod): boolean {
   return p.soldOut || periodRemaining(p) <= 0;
 }
 
-/** Per-potato counts for the public status, named for display. */
-function stockFor(p: ServicePeriod) {
-  return p.stock.map((s) => ({
-    itemId: s.itemId,
-    name: MAIN_ITEMS.find((m) => m.id === s.itemId)?.name ?? s.itemId,
-    today: s.today,
-    max: s.max,
-  }));
-}
-
 /**
  * The line printed under an "Order on Heartland" CTA.
  *
@@ -291,7 +281,6 @@ function stockFor(p: ServicePeriod) {
 export function orderNote(status: OpenStatus): string {
   switch (status.state) {
     case "open":
-    case "low":
       return "Opens in a new tab";
     case "sold-out":
       return "Today's batch is gone — order ahead for our next service";
@@ -304,7 +293,7 @@ export function orderNote(status: OpenStatus): string {
 
 /** True only when the truck is actually serving — for copy, never for gating. */
 export function isServingNow(status: OpenStatus): boolean {
-  return status.state === "open" || status.state === "low";
+  return status.state === "open";
 }
 
 /** Every day any service runs — for "is the truck out at all today?" checks. */
@@ -392,17 +381,21 @@ export function deriveOpenStatus(state: SiteState): OpenStatus {
           };
     }
 
-    const remaining = periodRemaining(active);
-    const max = periodMax(active);
-    const low = remaining <= Math.ceil(max * 0.25);
+    // The public status deliberately knows nothing about quantities. It used
+    // to publish exact counts and an "Almost gone" state derived from them,
+    // but the counts are only as fresh as the last time Edward opened the
+    // dashboard mid-rush — so the site claimed to know an inventory it didn't.
+    // It failed both ways: silent through a rush he hadn't logged, and stuck
+    // on "Almost gone" the next morning over a full batch.
+    //
+    // What's left is what he can actually keep true with one toggle each:
+    // open, sold out, closed, catering. Counts still live in the dashboard and
+    // still flip the truck to sold out when they hit zero — see isSoldOut.
     return {
-      state: low ? "low" : "open",
-      label: low ? "Almost gone" : "Open now",
-      detail: `${active.label} · ${remaining} of ${max} portions left`,
-      remaining,
-      max,
+      state: "open",
+      label: "Open now",
+      detail: `${active.label} · until ${formatTime(active.close)}`,
       periodLabel: active.label,
-      stock: stockFor(active),
     };
   }
 
@@ -415,10 +408,7 @@ export function deriveOpenStatus(state: SiteState): OpenStatus {
       state: "closed",
       label: "Closed right now",
       detail: `${next.label} starts at ${formatTime(next.open)}`,
-      remaining: periodRemaining(next),
-      max: periodMax(next),
       periodLabel: next.label,
-      stock: stockFor(next),
     };
   }
 
